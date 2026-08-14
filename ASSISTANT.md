@@ -22,3 +22,4 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - Do not hardcode too many personal services beyond useful starter defaults.
 - Browser `localStorage` is acceptable only for per-device overrides. Published defaults should come from `apps.json`.
 - Maintain TV/tablet usability: large targets, stable grid cells, strong focus states, and short labels.
+- Preserve kiosk behavior: no document scrolling in fullscreen, arrow-key/remote navigation, and Enter-to-open app cards.

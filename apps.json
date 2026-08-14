@@ -1,5 +1,5 @@
 {
-  "gridSize": 3,
+  "columns": 3,
   "apps": [
     {
       "id": "kousentv",

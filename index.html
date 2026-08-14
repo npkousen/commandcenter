@@ -26,8 +26,14 @@
       box-sizing: border-box;
     }
 
+    html,
     body {
-      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      min-height: 100%;
       margin: 0;
       background:
         radial-gradient(circle at top left, rgba(47, 128, 237, 0.20), transparent 36rem),
@@ -52,13 +58,14 @@
     }
 
     .shell {
-      min-height: 100vh;
+      height: 100dvh;
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
     }
 
     .topbar {
-      height: 72px;
+      height: clamp(62px, 9vh, 82px);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -117,12 +124,15 @@
     }
 
     .main {
-      width: min(1180px, 100%);
+      width: 100%;
+      height: 100%;
+      min-height: 0;
       margin: 0 auto;
-      padding: clamp(18px, 4vw, 44px);
+      padding: clamp(14px, 2.6vmin, 32px);
       display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 24px;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(10px, 2vmin, 22px);
+      overflow: hidden;
     }
 
     .controls {
@@ -196,21 +206,31 @@
     }
 
     .grid-wrap {
-      min-height: min(72vh, 840px);
+      min-height: 0;
+      height: 100%;
+      width: 100%;
       display: grid;
       place-items: center;
+      overflow: hidden;
     }
 
     .app-grid {
-      width: min(100%, 920px);
+      --cell-size: 180px;
+      --grid-gap: clamp(10px, 1.5vmin, 18px);
+      width: max-content;
+      max-width: 100%;
+      max-height: 100%;
       display: grid;
-      grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
-      gap: clamp(10px, 1.8vw, 18px);
+      grid-template-columns: repeat(var(--columns), var(--cell-size));
+      grid-auto-rows: var(--cell-size);
+      gap: var(--grid-gap);
+      align-content: center;
+      justify-content: center;
     }
 
     .slot {
-      aspect-ratio: 1 / 1;
       min-width: 0;
+      min-height: 0;
       position: relative;
       border-radius: 8px;
     }
@@ -243,11 +263,13 @@
     }
 
     .app-card:hover,
-    .app-card:focus-visible {
+    .app-card:focus-visible,
+    .app-card.remote-focus {
       transform: translateY(-3px);
       border-color: rgba(255, 255, 255, 0.42);
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
-      outline: none;
+      outline: 4px solid rgba(255, 255, 255, 0.82);
+      outline-offset: 4px;
     }
 
     .app-content {
@@ -259,14 +281,14 @@
     }
 
     .app-icon {
-      width: clamp(42px, 7vw, 72px);
-      height: clamp(42px, 7vw, 72px);
+      width: clamp(42px, calc(var(--cell-size) * 0.24), 104px);
+      height: clamp(42px, calc(var(--cell-size) * 0.24), 104px);
       display: grid;
       place-items: center;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.16);
       border: 1px solid rgba(255, 255, 255, 0.18);
-      font-size: clamp(1.15rem, 2.8vw, 2rem);
+      font-size: clamp(1.15rem, calc(var(--cell-size) * 0.12), 2.75rem);
       font-weight: 800;
       text-transform: uppercase;
     }
@@ -274,7 +296,7 @@
     .app-name {
       width: 100%;
       overflow-wrap: anywhere;
-      font-size: clamp(0.88rem, 1.8vw, 1.13rem);
+      font-size: clamp(0.92rem, calc(var(--cell-size) * 0.07), 1.65rem);
       font-weight: 740;
       line-height: 1.18;
     }
@@ -328,7 +350,8 @@
     }
 
     .add-card:hover,
-    .add-card:focus-visible {
+    .add-card:focus-visible,
+    .add-card.remote-focus {
       background: rgba(34, 197, 94, 0.28);
       transform: translateY(-2px);
       outline: 2px solid rgba(34, 197, 94, 0.75);
@@ -475,7 +498,6 @@
 
     @media (max-width: 720px) {
       .topbar {
-        height: auto;
         min-height: 68px;
         gap: 12px;
       }
@@ -513,12 +535,6 @@
         gap: 10px;
       }
     }
-
-    @media (max-width: 460px) {
-      .app-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
   </style>
 </head>
 <body>
@@ -538,9 +554,9 @@
         <p class="mode-copy" id="settingsCopy">Settings mode is on. Changes on this device override the published app list.</p>
         <div class="settings-actions">
           <div class="grid-size-group" role="group" aria-label="Grid size">
-            <button class="grid-size" type="button" data-grid-size="3">3x3</button>
-            <button class="grid-size" type="button" data-grid-size="4">4x4</button>
-            <button class="grid-size" type="button" data-grid-size="5">5x5</button>
+            <button class="grid-size" type="button" data-columns="3">3 Col</button>
+            <button class="grid-size" type="button" data-columns="4">4 Col</button>
+            <button class="grid-size" type="button" data-columns="5">5 Col</button>
           </div>
           <button class="reset-button" id="resetPublished" type="button">Reset to Published</button>
         </div>
@@ -598,8 +614,9 @@
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
     const LEGACY_STORAGE_KEY = "kousen-commandcenter:v1";
     const CONFIG_URL = "apps.json";
+    const COLUMN_OPTIONS = [3, 4, 5];
     const FALLBACK_STATE = {
-      gridSize: 3,
+      columns: 3,
       apps: [
         {
           id: "kousentv",
@@ -619,6 +636,7 @@
     };
 
     const shell = document.getElementById("appShell");
+    const main = document.querySelector(".main");
     const appGrid = document.getElementById("appGrid");
     const settingsToggle = document.getElementById("settingsToggle");
     const modeLabel = document.getElementById("modeLabel");
@@ -638,22 +656,24 @@
     let state = cloneState(FALLBACK_STATE);
     let settingsMode = false;
     let hasLocalOverride = false;
+    let gridMetricFrame = 0;
+    let renderedColumns = 3;
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
     }
 
     function validateState(candidate) {
-      if (!candidate || ![3, 4, 5].includes(candidate.gridSize) || !Array.isArray(candidate.apps)) {
+      const columns = Number(candidate?.columns || candidate?.gridSize);
+      if (!candidate || !COLUMN_OPTIONS.includes(columns) || !Array.isArray(candidate.apps)) {
         return null;
       }
 
-      const totalSlots = candidate.gridSize * candidate.gridSize;
       const usedSlots = new Set();
       const apps = [];
 
       candidate.apps.forEach((app) => {
-        if (!app || !Number.isInteger(app.slot) || app.slot < 0 || app.slot >= totalSlots || usedSlots.has(app.slot)) {
+        if (!app || !Number.isInteger(app.slot) || app.slot < 0 || usedSlots.has(app.slot)) {
           return;
         }
 
@@ -675,7 +695,7 @@
       });
 
       return {
-        gridSize: candidate.gridSize,
+        columns,
         apps
       };
     }
@@ -723,16 +743,26 @@
     }
 
     function render() {
-      const totalSlots = state.gridSize * state.gridSize;
-      const visibleApps = state.apps.filter((app) => app.slot < totalSlots);
+      const columns = state.columns;
+      const visibleApps = state.apps
+        .slice()
+        .sort((a, b) => a.slot - b.slot);
+      const maxSlot = visibleApps.reduce((highest, app) => Math.max(highest, app.slot), -1);
+      const occupiedSlots = Math.max(maxSlot + 1, visibleApps.length);
+      const displayColumns = settingsMode ? columns : Math.min(columns, Math.max(1, occupiedSlots));
+      const rowCount = Math.max(1, Math.ceil(occupiedSlots / displayColumns));
+      const renderRows = settingsMode ? Math.max(rowCount, Math.ceil((occupiedSlots + 1) / displayColumns)) : rowCount;
+      const totalSlots = settingsMode ? renderRows * displayColumns : occupiedSlots;
+      renderedColumns = displayColumns;
 
-      appGrid.style.setProperty("--grid-size", state.gridSize);
+      appGrid.style.setProperty("--columns", displayColumns);
+      appGrid.style.setProperty("--rows", renderRows);
       appGrid.innerHTML = "";
 
       document.querySelectorAll(".grid-size").forEach((button) => {
-        const size = Number(button.dataset.gridSize);
-        button.classList.toggle("active", size === state.gridSize);
-        button.setAttribute("aria-pressed", String(size === state.gridSize));
+        const size = Number(button.dataset.columns);
+        button.classList.toggle("active", size === columns);
+        button.setAttribute("aria-pressed", String(size === columns));
       });
 
       resetPublished.disabled = !hasLocalOverride;
@@ -749,22 +779,27 @@
       for (let slot = 0; slot < totalSlots; slot += 1) {
         const slotNode = document.createElement("div");
         slotNode.className = "slot";
+        slotNode.dataset.slot = String(slot);
         const app = state.apps.find((item) => item.slot === slot);
 
         if (app) {
           slotNode.appendChild(createAppCard(app));
-        } else {
+        } else if (settingsMode) {
           slotNode.appendChild(createAddButton(slot));
         }
 
         appGrid.appendChild(slotNode);
       }
+
+      queueGridMetrics();
+      restoreUsefulFocus();
     }
 
     function createAppCard(app) {
       const link = document.createElement("a");
       link.className = "app-card";
       link.href = normalizeUrl(app.url);
+      link.dataset.slot = String(app.slot);
       link.style.setProperty("--card-color", app.color || "#2563eb");
       link.setAttribute("aria-label", `Open ${app.name}`);
 
@@ -827,6 +862,7 @@
       const button = document.createElement("button");
       button.className = "add-card";
       button.type = "button";
+      button.dataset.slot = String(slot);
       button.setAttribute("aria-label", `Add app to slot ${slot + 1}`);
       button.innerHTML = '<span class="plus-mark" aria-hidden="true">+</span>';
       button.addEventListener("click", () => openDialog(slot));
@@ -885,7 +921,7 @@
 
     document.querySelectorAll(".grid-size").forEach((button) => {
       button.addEventListener("click", () => {
-        state.gridSize = Number(button.dataset.gridSize);
+        state.columns = Number(button.dataset.columns);
         saveState();
         render();
       });
@@ -919,12 +955,182 @@
     });
 
     document.addEventListener("keydown", (event) => {
+      handleRemoteNavigation(event);
+
       if (event.key === "Escape" && document.body.classList.contains("modal-open")) {
         closeDialogBox();
       }
     });
 
     resetPublished.addEventListener("click", clearLocalOverride);
+    window.addEventListener("resize", queueGridMetrics);
+    window.addEventListener("load", queueGridMetrics);
+
+    function getGridGap() {
+      return Number.parseFloat(getComputedStyle(appGrid).gap) || 0;
+    }
+
+    function queueGridMetrics() {
+      if (gridMetricFrame) {
+        cancelAnimationFrame(gridMetricFrame);
+      }
+
+      gridMetricFrame = requestAnimationFrame(() => {
+        updateGridMetrics();
+        gridMetricFrame = requestAnimationFrame(() => {
+          updateGridMetrics();
+          gridMetricFrame = 0;
+        });
+      });
+    }
+
+    function updateGridMetrics() {
+      const columns = renderedColumns || state.columns || 3;
+      const rows = Number(appGrid.style.getPropertyValue("--rows")) || 1;
+      const gap = getGridGap();
+      const topbarHeight = document.querySelector(".topbar").getBoundingClientRect().height;
+      const controlsHeight = settingsMode ? document.querySelector(".controls").getBoundingClientRect().height + gap : 0;
+      const mainStyles = getComputedStyle(main);
+      const horizontalPadding = Number.parseFloat(mainStyles.paddingLeft) + Number.parseFloat(mainStyles.paddingRight);
+      const verticalPadding = Number.parseFloat(mainStyles.paddingTop) + Number.parseFloat(mainStyles.paddingBottom);
+      const wrapWidth = Math.max(0, window.innerWidth - horizontalPadding);
+      const wrapHeight = Math.max(240, window.innerHeight - topbarHeight - controlsHeight - verticalPadding);
+      const availableWidth = Math.max(0, wrapWidth - gap * (columns - 1));
+      const availableHeight = Math.max(0, wrapHeight - gap * (rows - 1));
+      const cellSize = Math.floor(Math.min(availableWidth / columns, availableHeight / rows));
+      const normalizedSize = Number.isFinite(cellSize) ? Math.max(64, cellSize) : 180;
+
+      appGrid.style.setProperty("--cell-size", `${normalizedSize}px`);
+      appGrid.style.gridTemplateColumns = `repeat(${columns}, ${normalizedSize}px)`;
+      appGrid.style.gridAutoRows = `${normalizedSize}px`;
+    }
+
+    function getGridTargets() {
+      return Array.from(appGrid.querySelectorAll(".app-card, .add-card"));
+    }
+
+    function getTargetSlot(target) {
+      return Number(target?.dataset?.slot || -1);
+    }
+
+    function focusTarget(target) {
+      if (!target) {
+        return;
+      }
+
+      document.querySelectorAll(".remote-focus").forEach((item) => item.classList.remove("remote-focus"));
+      target.focus({ preventScroll: true });
+      target.classList.add("remote-focus");
+    }
+
+    function restoreUsefulFocus() {
+      if (document.body.classList.contains("modal-open")) {
+        return;
+      }
+
+      const active = document.activeElement;
+      if (active && active !== document.body && active !== document.documentElement && document.contains(active)) {
+        return;
+      }
+
+      focusTarget(getGridTargets()[0] || settingsToggle);
+    }
+
+    function findNextGridTarget(currentSlot, direction) {
+      const columns = renderedColumns || state.columns;
+      const targets = getGridTargets();
+      const slotMap = new Map(targets.map((target) => [getTargetSlot(target), target]));
+      const maxSlot = Math.max(...targets.map(getTargetSlot), 0);
+      let nextSlot = currentSlot;
+
+      for (let attempts = 0; attempts <= maxSlot + columns; attempts += 1) {
+        if (direction === "right") {
+          nextSlot += 1;
+        } else if (direction === "left") {
+          nextSlot -= 1;
+        } else if (direction === "down") {
+          nextSlot += columns;
+        } else if (direction === "up") {
+          nextSlot -= columns;
+        }
+
+        if (slotMap.has(nextSlot)) {
+          return slotMap.get(nextSlot);
+        }
+
+        if (nextSlot < 0 || nextSlot > maxSlot + columns) {
+          return null;
+        }
+      }
+
+      return null;
+    }
+
+    function handleRemoteNavigation(event) {
+      if (document.body.classList.contains("modal-open")) {
+        return;
+      }
+
+      const active = document.activeElement;
+      const isGridTarget = active?.classList?.contains("app-card") || active?.classList?.contains("add-card");
+      const isSettingsTarget = active === settingsToggle;
+      const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", "Backspace", "Escape"];
+
+      if (!remoteKeys.includes(event.key)) {
+        return;
+      }
+
+      if ((event.key === "Enter" || event.key === " ") && active?.tagName === "A") {
+        event.preventDefault();
+        active.click();
+        return;
+      }
+
+      if ((event.key === "Backspace" || event.key === "Escape") && settingsMode) {
+        event.preventDefault();
+        settingsToggle.click();
+        focusTarget(getGridTargets()[0] || settingsToggle);
+        return;
+      }
+
+      if (isSettingsTarget && event.key === "ArrowDown") {
+        event.preventDefault();
+        focusTarget(getGridTargets()[0]);
+        return;
+      }
+
+      if (!isGridTarget) {
+        if (event.key.startsWith("Arrow")) {
+          event.preventDefault();
+          focusTarget(getGridTargets()[0] || settingsToggle);
+        }
+        return;
+      }
+
+      if (event.key === "ArrowUp" && getTargetSlot(active) < (renderedColumns || state.columns)) {
+        event.preventDefault();
+        focusTarget(settingsToggle);
+        return;
+      }
+
+      const directionByKey = {
+        ArrowRight: "right",
+        ArrowLeft: "left",
+        ArrowUp: "up",
+        ArrowDown: "down"
+      };
+      const direction = directionByKey[event.key];
+
+      if (!direction) {
+        return;
+      }
+
+      const nextTarget = findNextGridTarget(getTargetSlot(active), direction);
+      if (nextTarget) {
+        event.preventDefault();
+        focusTarget(nextTarget);
+      }
+    }
 
     render();
     initializeState();

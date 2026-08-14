@@ -18,7 +18,7 @@ Then open:
 http://127.0.0.1:8080
 ```
 
-The app stores its grid size and app cards in browser `localStorage`.
+The app loads shared app cards from `apps.json`. Browser `localStorage` is used only for per-device overrides made through settings mode.
 
 ## Container Testing
 
@@ -48,19 +48,32 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 
 - The top-left title is `Kousen CommandCenter`.
 - The top-right settings button toggles edit mode.
-- Edit mode shows grid-size controls for `3x3`, `4x4`, and `5x5`.
+- Edit mode shows column controls for `3`, `4`, and `5` columns.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
 - Existing cards can be edited or deleted while settings mode is on.
 - Published/shared app cards are defined in `apps.json`.
 - Settings changes made in the browser are stored as local overrides for that device.
 - The settings panel can reset a device back to the published `apps.json` list.
+- The grid and cards resize to fit the visible browser viewport without page scrolling.
+- App cards support keyboard/remote navigation with arrow keys and Enter.
 
 ## Updating Shared Apps
 
 Edit `apps.json`, commit the change, and push to `main`.
 
 GitHub Pages will publish the new app list automatically. Devices with no local overrides will pick up the published list on their next page load.
+
+`apps.json` uses `columns` to choose the layout width:
+
+```json
+{
+  "columns": 3,
+  "apps": []
+}
+```
+
+Supported column counts are `3`, `4`, and `5`. Rows are calculated automatically from the configured apps.
 
 ## Optional LAN Deployment Strategy
 
@@ -81,12 +94,6 @@ DNS can point `kousen.cc` at the CommandCenter IP, but DNS cannot include a port
 
 See `docs/deployment.md` for the optional TrueNAS compose and GitHub Container Registry deployment flow.
 
-## Shared Configuration Later
-
-This MVP uses browser-local storage. That is good for quick local testing, but each device gets its own layout.
-
-If one shared layout is needed across TVs, tablets, and computers, add a tiny backend later that reads and writes a JSON config file. The UI can stay mostly the same.
-
 ## Files
 
 - `index.html` - complete application
@@ -94,7 +101,7 @@ If one shared layout is needed across TVs, tablets, and computers, add a tiny ba
 - `Dockerfile` - optional static nginx container
 - `docker-compose.yml` - optional local container run
 - `deploy/truenas-compose.yml` - TrueNAS deployment compose file
-- `.github/workflows/publish-image.yml` - builds and publishes the container image on pushes to `main`
+- `.github/workflows/publish-image.yml` - manual workflow for publishing the optional container image
 - `docs/github-pages.md` - GitHub Pages and Porkbun DNS setup
 - `docs/deployment.md` - LAN, DNS, TrueNAS, and CI/CD notes
 - `.dockerignore` - keeps container context small
