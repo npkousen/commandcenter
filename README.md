@@ -56,7 +56,9 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Settings changes made in the browser are stored as local overrides for that device.
 - The settings panel can reset a device back to the published `apps.json` list.
 - The grid and cards resize to fit the visible browser viewport without page scrolling.
+- Cards are capped at one-third of the shorter screen dimension so they do not dominate the TV display.
 - App cards support keyboard/remote navigation with arrow keys and Enter.
+- In settings mode, cards are not selectable; remote focus moves through the column controls, reset, add, edit, and delete buttons.
 
 ## Updating Shared Apps
 
