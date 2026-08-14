@@ -1,0 +1,7 @@
+services:
+  commandcenter:
+    image: ghcr.io/npkousen/commandcenter:latest
+    container_name: kousen-commandcenter
+    ports:
+      - "192.168.10.50:80:80"
+    restart: unless-stopped

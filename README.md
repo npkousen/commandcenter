@@ -20,6 +20,20 @@ http://127.0.0.1:8080
 
 The app stores its grid size and app cards in browser `localStorage`.
 
+## Container Testing
+
+Build and run the local nginx container:
+
+```sh
+docker compose up -d --build
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8080
+```
+
 ## Current Behavior
 
 - The top-left title is `Kousen CommandCenter`.
@@ -46,6 +60,8 @@ Where `192.168.10.50` is an additional static IP/alias on the TrueNAS host reser
 
 DNS can point `kousen.cc` at the CommandCenter IP, but DNS cannot include a port. For `http://kousen.cc` to work, CommandCenter must answer on port `80`.
 
+See `docs/deployment.md` for the TrueNAS compose and GitHub Container Registry deployment flow.
+
 ## Shared Configuration Later
 
 This MVP uses browser-local storage. That is good for quick local testing, but each device gets its own layout.
@@ -57,7 +73,9 @@ If one shared layout is needed across TVs, tablets, and computers, add a tiny ba
 - `index.html` - complete application
 - `Dockerfile` - optional static nginx container
 - `docker-compose.yml` - optional local container run
+- `deploy/truenas-compose.yml` - TrueNAS deployment compose file
+- `.github/workflows/publish-image.yml` - builds and publishes the container image on pushes to `main`
+- `docs/deployment.md` - LAN, DNS, TrueNAS, and CI/CD notes
 - `.dockerignore` - keeps container context small
 - `.gitignore` - excludes local/editor/generated files
 - `ASSISTANT.md` - implementation notes for future assistant work
-
