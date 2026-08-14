@@ -1,0 +1,25 @@
+# Assistant Notes
+
+## Project Intent
+
+Keep Kousen CommandCenter lightweight. The app should remain static-first and easy to host from TrueNAS, nginx, Caddy, or a small Docker container.
+
+The user explicitly prefers a straightforward implementation concentrated in a single `index.html` instead of a framework-heavy app.
+
+## Network Assumptions
+
+- TrueNAS SCALE is the expected always-on host.
+- The NAS management IP is currently `192.168.10.10`.
+- The intended CommandCenter pattern is to add a separate TrueNAS interface alias, such as `192.168.10.50`, and bind the CommandCenter web server to that address on port `80`.
+- Public DNS may point `kousen.cc` at a private LAN IP, matching the earlier `kousen.tv` approach.
+- DNS cannot map a hostname to a port. Clean URLs require a service listening on `80` or `443`.
+
+## Implementation Guardrails
+
+- Avoid adding build tooling unless the feature set clearly needs it.
+- Prefer one static `index.html`.
+- Keep app definitions data-driven.
+- Do not hardcode too many personal services beyond useful starter defaults.
+- Browser `localStorage` is acceptable for the MVP. Use a shared JSON backend only if the user asks for one layout across all devices.
+- Maintain TV/tablet usability: large targets, stable grid cells, strong focus states, and short labels.
+

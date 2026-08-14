@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Kousen CommandCenter</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111827;
+      --panel: #182231;
+      --panel-2: #202c3d;
+      --text: #f8fafc;
+      --muted: #aeb8c6;
+      --line: #314156;
+      --accent: #2f80ed;
+      --green: #22c55e;
+      --green-dark: #12823a;
+      --danger: #ef4444;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(47, 128, 237, 0.20), transparent 36rem),
+        linear-gradient(135deg, #111827 0%, #172033 46%, #10151f 100%);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(18px, 4vw, 52px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(17, 24, 39, 0.72);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.3vw, 1.8rem);
+      line-height: 1.1;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .settings-button {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .settings-button:hover,
+    .settings-button:focus-visible {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.24);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .settings-button[aria-pressed="true"] {
+      background: rgba(47, 128, 237, 0.26);
+      border-color: rgba(47, 128, 237, 0.55);
+    }
+
+    .settings-icon {
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 44px);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 24px;
+    }
+
+    .controls {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 42px;
+    }
+
+    .settings-on .controls {
+      display: flex;
+    }
+
+    .mode-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .grid-size-group {
+      display: flex;
+      gap: 8px;
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .grid-size {
+      min-width: 54px;
+      height: 34px;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .grid-size:hover,
+    .grid-size:focus-visible {
+      color: var(--text);
+      outline: 2px solid rgba(47, 128, 237, 0.6);
+      outline-offset: 2px;
+    }
+
+    .grid-size.active {
+      color: var(--text);
+      background: var(--accent);
+    }
+
+    .grid-wrap {
+      min-height: min(72vh, 840px);
+      display: grid;
+      place-items: center;
+    }
+
+    .app-grid {
+      width: min(100%, 920px);
+      display: grid;
+      grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
+      gap: clamp(10px, 1.8vw, 18px);
+    }
+
+    .slot {
+      aspect-ratio: 1 / 1;
+      min-width: 0;
+      position: relative;
+      border-radius: 8px;
+    }
+
+    .settings-on .slot {
+      border: 1px dashed rgba(255, 255, 255, 0.20);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .app-card,
+    .add-card {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .app-card {
+      position: relative;
+      padding: clamp(10px, 2vw, 20px);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035)),
+        var(--card-color);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: var(--shadow);
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .app-card:hover,
+    .app-card:focus-visible {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.42);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+      outline: none;
+    }
+
+    .app-content {
+      display: grid;
+      place-items: center;
+      gap: clamp(8px, 1.4vw, 14px);
+      min-width: 0;
+      width: 100%;
+    }
+
+    .app-icon {
+      width: clamp(42px, 7vw, 72px);
+      height: clamp(42px, 7vw, 72px);
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: clamp(1.15rem, 2.8vw, 2rem);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .app-name {
+      width: 100%;
+      overflow-wrap: anywhere;
+      font-size: clamp(0.88rem, 1.8vw, 1.13rem);
+      font-weight: 740;
+      line-height: 1.18;
+    }
+
+    .edit-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: none;
+      gap: 6px;
+    }
+
+    .settings-on .edit-actions {
+      display: flex;
+    }
+
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.36);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.72);
+      outline-offset: 1px;
+    }
+
+    .delete-button:hover,
+    .delete-button:focus-visible {
+      background: rgba(239, 68, 68, 0.82);
+    }
+
+    .add-card {
+      color: var(--text);
+      background: rgba(34, 197, 94, 0.18);
+      border: 1px dashed rgba(34, 197, 94, 0.66);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms ease, background 140ms ease, transform 140ms ease;
+    }
+
+    .settings-on .add-card {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .add-card:hover,
+    .add-card:focus-visible {
+      background: rgba(34, 197, 94, 0.28);
+      transform: translateY(-2px);
+      outline: 2px solid rgba(34, 197, 94, 0.75);
+      outline-offset: 2px;
+    }
+
+    .plus-mark {
+      width: clamp(38px, 7vw, 64px);
+      height: clamp(38px, 7vw, 64px);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: #052e16;
+      font-size: clamp(1.5rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 14px 34px rgba(18, 130, 58, 0.38);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 52px 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(7, 10, 16, 0.72);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .modal-open .modal-backdrop {
+      display: grid;
+    }
+
+    .dialog {
+      width: min(440px, 100%);
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: var(--shadow);
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .dialog-title {
+      margin: 0;
+      font-size: 1.12rem;
+    }
+
+    .form {
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(47, 128, 237, 0.84);
+      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.18);
+    }
+
+    .field option {
+      color: #111827;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .secondary,
+    .primary {
+      min-height: 42px;
+      border-radius: 6px;
+      padding: 0 16px;
+      color: var(--text);
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .primary {
+      background: var(--green);
+      color: #062814;
+      font-weight: 760;
+    }
+
+    .primary:hover,
+    .primary:focus-visible {
+      background: #3ee173;
+      outline: none;
+    }
+
+    .hint {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        height: auto;
+        min-height: 68px;
+        gap: 12px;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .main {
+        gap: 16px;
+      }
+
+      .controls {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .grid-size-group {
+        width: 100%;
+      }
+
+      .grid-size {
+        flex: 1;
+      }
+
+      .app-grid {
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .app-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="appShell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Kousen CommandCenter</h1>
+        <p id="modeLabel">Home network launchpad</p>
+      </div>
+      <button class="settings-button" id="settingsToggle" type="button" aria-label="Toggle settings" aria-pressed="false" title="Settings">
+        <span class="settings-icon" aria-hidden="true">&#9881;</span>
+      </button>
+    </header>
+
+    <main class="main">
+      <section class="controls" aria-label="Layout controls">
+        <p class="mode-copy">Settings mode is on. Add, edit, or remove app cards.</p>
+        <div class="grid-size-group" role="group" aria-label="Grid size">
+          <button class="grid-size" type="button" data-grid-size="3">3x3</button>
+          <button class="grid-size" type="button" data-grid-size="4">4x4</button>
+          <button class="grid-size" type="button" data-grid-size="5">5x5</button>
+        </div>
+      </section>
+
+      <section class="grid-wrap" aria-label="CommandCenter apps">
+        <div class="app-grid" id="appGrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="presentation">
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="dialogTitle">Add App</h2>
+        <button class="icon-button" id="closeDialog" type="button" aria-label="Close dialog" title="Close">x</button>
+      </div>
+      <form class="form" id="appForm">
+        <input type="hidden" id="slotInput">
+        <input type="hidden" id="editingId">
+
+        <div class="field">
+          <label for="nameInput">App name</label>
+          <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
+        </div>
+
+        <div class="field">
+          <label for="urlInput">URL</label>
+          <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
+          <p class="hint">Include the port when the app is not using standard HTTP or HTTPS.</p>
+        </div>
+
+        <div class="field">
+          <label for="colorInput">Card color</label>
+          <select id="colorInput" name="color">
+            <option value="#2563eb">Blue</option>
+            <option value="#16a34a">Green</option>
+            <option value="#dc2626">Red</option>
+            <option value="#d97706">Amber</option>
+            <option value="#7c3aed">Violet</option>
+            <option value="#0f766e">Teal</option>
+            <option value="#475569">Graphite</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="secondary" id="cancelDialog" type="button">Cancel</button>
+          <button class="primary" type="submit">Save App</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "kousen-commandcenter:v1";
+    const DEFAULT_STATE = {
+      gridSize: 3,
+      apps: [
+        {
+          id: "kousentv",
+          name: "KousenTV",
+          url: "http://192.168.10.10:8000",
+          color: "#2563eb",
+          slot: 0
+        },
+        {
+          id: "plex",
+          name: "Plex",
+          url: "http://192.168.10.10:32400/web",
+          color: "#d97706",
+          slot: 1
+        }
+      ]
+    };
+
+    const shell = document.getElementById("appShell");
+    const appGrid = document.getElementById("appGrid");
+    const settingsToggle = document.getElementById("settingsToggle");
+    const modeLabel = document.getElementById("modeLabel");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const appForm = document.getElementById("appForm");
+    const dialogTitle = document.getElementById("dialogTitle");
+    const closeDialog = document.getElementById("closeDialog");
+    const cancelDialog = document.getElementById("cancelDialog");
+    const slotInput = document.getElementById("slotInput");
+    const editingId = document.getElementById("editingId");
+    const nameInput = document.getElementById("nameInput");
+    const urlInput = document.getElementById("urlInput");
+    const colorInput = document.getElementById("colorInput");
+
+    let state = loadState();
+    let settingsMode = false;
+
+    function cloneState(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadState() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!stored || ![3, 4, 5].includes(stored.gridSize) || !Array.isArray(stored.apps)) {
+          return cloneState(DEFAULT_STATE);
+        }
+        return {
+          gridSize: stored.gridSize,
+          apps: stored.apps.filter((app) => Number.isInteger(app.slot))
+        };
+      } catch {
+        return cloneState(DEFAULT_STATE);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function render() {
+      const totalSlots = state.gridSize * state.gridSize;
+      const visibleApps = state.apps.filter((app) => app.slot < totalSlots);
+
+      appGrid.style.setProperty("--grid-size", state.gridSize);
+      appGrid.innerHTML = "";
+
+      document.querySelectorAll(".grid-size").forEach((button) => {
+        const size = Number(button.dataset.gridSize);
+        button.classList.toggle("active", size === state.gridSize);
+        button.setAttribute("aria-pressed", String(size === state.gridSize));
+      });
+
+      if (!settingsMode && visibleApps.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "Open settings to add CommandCenter apps.";
+        appGrid.appendChild(empty);
+        return;
+      }
+
+      for (let slot = 0; slot < totalSlots; slot += 1) {
+        const slotNode = document.createElement("div");
+        slotNode.className = "slot";
+        const app = state.apps.find((item) => item.slot === slot);
+
+        if (app) {
+          slotNode.appendChild(createAppCard(app));
+        } else {
+          slotNode.appendChild(createAddButton(slot));
+        }
+
+        appGrid.appendChild(slotNode);
+      }
+    }
+
+    function createAppCard(app) {
+      const link = document.createElement("a");
+      link.className = "app-card";
+      link.href = normalizeUrl(app.url);
+      link.style.setProperty("--card-color", app.color || "#2563eb");
+      link.setAttribute("aria-label", `Open ${app.name}`);
+
+      const actions = document.createElement("div");
+      actions.className = "edit-actions";
+
+      const editButton = document.createElement("button");
+      editButton.className = "icon-button";
+      editButton.type = "button";
+      editButton.innerHTML = "&#9998;";
+      editButton.title = "Edit";
+      editButton.setAttribute("aria-label", `Edit ${app.name}`);
+      editButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openDialog(app.slot, app);
+      });
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "icon-button delete-button";
+      deleteButton.type = "button";
+      deleteButton.innerHTML = "&#128465;";
+      deleteButton.title = "Delete";
+      deleteButton.setAttribute("aria-label", `Delete ${app.name}`);
+      deleteButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        state.apps = state.apps.filter((item) => item.id !== app.id);
+        saveState();
+        render();
+      });
+
+      actions.append(editButton, deleteButton);
+
+      const content = document.createElement("span");
+      content.className = "app-content";
+
+      const icon = document.createElement("span");
+      icon.className = "app-icon";
+      icon.textContent = getInitials(app.name);
+
+      const name = document.createElement("span");
+      name.className = "app-name";
+      name.textContent = app.name;
+
+      content.append(icon, name);
+      link.append(actions, content);
+
+      link.addEventListener("click", (event) => {
+        if (settingsMode) {
+          event.preventDefault();
+          openDialog(app.slot, app);
+        }
+      });
+
+      return link;
+    }
+
+    function createAddButton(slot) {
+      const button = document.createElement("button");
+      button.className = "add-card";
+      button.type = "button";
+      button.setAttribute("aria-label", `Add app to slot ${slot + 1}`);
+      button.innerHTML = '<span class="plus-mark" aria-hidden="true">+</span>';
+      button.addEventListener("click", () => openDialog(slot));
+      return button;
+    }
+
+    function openDialog(slot, app = null) {
+      dialogTitle.textContent = app ? "Edit App" : "Add App";
+      slotInput.value = String(slot);
+      editingId.value = app ? app.id : "";
+      nameInput.value = app ? app.name : "";
+      urlInput.value = app ? app.url : "";
+      colorInput.value = app ? app.color : "#2563eb";
+      document.body.classList.add("modal-open");
+      nameInput.focus();
+    }
+
+    function closeDialogBox() {
+      document.body.classList.remove("modal-open");
+      appForm.reset();
+      editingId.value = "";
+      slotInput.value = "";
+    }
+
+    function normalizeUrl(rawUrl) {
+      const trimmed = String(rawUrl || "").trim();
+      if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+      }
+      return `http://${trimmed}`;
+    }
+
+    function getInitials(name) {
+      return String(name || "?")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((word) => word[0])
+        .join("") || "?";
+    }
+
+    function createId() {
+      if (crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return `app-${Date.now()}-${Math.round(Math.random() * 100000)}`;
+    }
+
+    settingsToggle.addEventListener("click", () => {
+      settingsMode = !settingsMode;
+      shell.classList.toggle("settings-on", settingsMode);
+      settingsToggle.setAttribute("aria-pressed", String(settingsMode));
+      modeLabel.textContent = settingsMode ? "Settings mode" : "Home network launchpad";
+      render();
+    });
+
+    document.querySelectorAll(".grid-size").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.gridSize = Number(button.dataset.gridSize);
+        saveState();
+        render();
+      });
+    });
+
+    appForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const id = editingId.value || createId();
+      const slot = Number(slotInput.value);
+      const app = {
+        id,
+        name: nameInput.value.trim(),
+        url: normalizeUrl(urlInput.value),
+        color: colorInput.value,
+        slot
+      };
+
+      state.apps = state.apps.filter((item) => item.id !== id && item.slot !== slot);
+      state.apps.push(app);
+      saveState();
+      closeDialogBox();
+      render();
+    });
+
+    closeDialog.addEventListener("click", closeDialogBox);
+    cancelDialog.addEventListener("click", closeDialogBox);
+    modalBackdrop.addEventListener("click", (event) => {
+      if (event.target === modalBackdrop) {
+        closeDialogBox();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && document.body.classList.contains("modal-open")) {
+        closeDialogBox();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
