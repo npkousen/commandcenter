@@ -52,6 +52,15 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
 - Existing cards can be edited or deleted while settings mode is on.
+- Published/shared app cards are defined in `apps.json`.
+- Settings changes made in the browser are stored as local overrides for that device.
+- The settings panel can reset a device back to the published `apps.json` list.
+
+## Updating Shared Apps
+
+Edit `apps.json`, commit the change, and push to `main`.
+
+GitHub Pages will publish the new app list automatically. Devices with no local overrides will pick up the published list on their next page load.
 
 ## Optional LAN Deployment Strategy
 

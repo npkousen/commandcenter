@@ -18,8 +18,7 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 
 - Avoid adding build tooling unless the feature set clearly needs it.
 - Prefer one static `index.html`.
-- Keep app definitions data-driven.
+- Keep shared app definitions in `apps.json`.
 - Do not hardcode too many personal services beyond useful starter defaults.
-- Browser `localStorage` is acceptable for the MVP. Use a shared JSON backend only if the user asks for one layout across all devices.
+- Browser `localStorage` is acceptable only for per-device overrides. Published defaults should come from `apps.json`.
 - Maintain TV/tablet usability: large targets, stable grid cells, strong focus states, and short labels.
-

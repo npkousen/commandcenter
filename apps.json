@@ -1,0 +1,19 @@
+{
+  "gridSize": 3,
+  "apps": [
+    {
+      "id": "kousentv",
+      "name": "KousenTV",
+      "url": "http://192.168.10.10:8000",
+      "color": "#2563eb",
+      "slot": 0
+    },
+    {
+      "id": "plex",
+      "name": "Plex",
+      "url": "http://192.168.10.10:32400/web",
+      "color": "#d97706",
+      "slot": 1
+    }
+  ]
+}

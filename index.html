@@ -152,6 +152,14 @@
       border: 1px solid rgba(255, 255, 255, 0.10);
     }
 
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .grid-size {
       min-width: 54px;
       height: 34px;
@@ -170,6 +178,21 @@
     .grid-size.active {
       color: var(--text);
       background: var(--accent);
+    }
+
+    .reset-button {
+      min-height: 42px;
+      border-radius: 6px;
+      padding: 0 14px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .reset-button:hover,
+    .reset-button:focus-visible {
+      outline: 2px solid rgba(47, 128, 237, 0.6);
+      outline-offset: 2px;
     }
 
     .grid-wrap {
@@ -474,8 +497,16 @@
         width: 100%;
       }
 
+      .settings-actions {
+        width: 100%;
+      }
+
       .grid-size {
         flex: 1;
+      }
+
+      .reset-button {
+        flex: 1 1 100%;
       }
 
       .app-grid {
@@ -504,11 +535,14 @@
 
     <main class="main">
       <section class="controls" aria-label="Layout controls">
-        <p class="mode-copy">Settings mode is on. Add, edit, or remove app cards.</p>
-        <div class="grid-size-group" role="group" aria-label="Grid size">
-          <button class="grid-size" type="button" data-grid-size="3">3x3</button>
-          <button class="grid-size" type="button" data-grid-size="4">4x4</button>
-          <button class="grid-size" type="button" data-grid-size="5">5x5</button>
+        <p class="mode-copy" id="settingsCopy">Settings mode is on. Changes on this device override the published app list.</p>
+        <div class="settings-actions">
+          <div class="grid-size-group" role="group" aria-label="Grid size">
+            <button class="grid-size" type="button" data-grid-size="3">3x3</button>
+            <button class="grid-size" type="button" data-grid-size="4">4x4</button>
+            <button class="grid-size" type="button" data-grid-size="5">5x5</button>
+          </div>
+          <button class="reset-button" id="resetPublished" type="button">Reset to Published</button>
         </div>
       </section>
 
@@ -561,8 +595,10 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "kousen-commandcenter:v1";
-    const DEFAULT_STATE = {
+    const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
+    const LEGACY_STORAGE_KEY = "kousen-commandcenter:v1";
+    const CONFIG_URL = "apps.json";
+    const FALLBACK_STATE = {
       gridSize: 3,
       apps: [
         {
@@ -596,31 +632,94 @@
     const nameInput = document.getElementById("nameInput");
     const urlInput = document.getElementById("urlInput");
     const colorInput = document.getElementById("colorInput");
+    const resetPublished = document.getElementById("resetPublished");
 
-    let state = loadState();
+    let publishedState = cloneState(FALLBACK_STATE);
+    let state = cloneState(FALLBACK_STATE);
     let settingsMode = false;
+    let hasLocalOverride = false;
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
     }
 
-    function loadState() {
+    function validateState(candidate) {
+      if (!candidate || ![3, 4, 5].includes(candidate.gridSize) || !Array.isArray(candidate.apps)) {
+        return null;
+      }
+
+      const totalSlots = candidate.gridSize * candidate.gridSize;
+      const usedSlots = new Set();
+      const apps = [];
+
+      candidate.apps.forEach((app) => {
+        if (!app || !Number.isInteger(app.slot) || app.slot < 0 || app.slot >= totalSlots || usedSlots.has(app.slot)) {
+          return;
+        }
+
+        const name = String(app.name || "").trim();
+        const url = String(app.url || "").trim();
+
+        if (!name || !url) {
+          return;
+        }
+
+        usedSlots.add(app.slot);
+        apps.push({
+          id: String(app.id || createId()),
+          name: name.slice(0, 36),
+          url: normalizeUrl(url),
+          color: String(app.color || "#2563eb"),
+          slot: app.slot
+        });
+      });
+
+      return {
+        gridSize: candidate.gridSize,
+        apps
+      };
+    }
+
+    function readLocalOverride() {
       try {
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!stored || ![3, 4, 5].includes(stored.gridSize) || !Array.isArray(stored.apps)) {
-          return cloneState(DEFAULT_STATE);
-        }
-        return {
-          gridSize: stored.gridSize,
-          apps: stored.apps.filter((app) => Number.isInteger(app.slot))
-        };
+        return validateState(stored);
       } catch {
-        return cloneState(DEFAULT_STATE);
+        return null;
       }
     }
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      hasLocalOverride = true;
+    }
+
+    function clearLocalOverride() {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      hasLocalOverride = false;
+      state = cloneState(publishedState);
+      render();
+    }
+
+    async function initializeState() {
+      try {
+        const response = await fetch(`${CONFIG_URL}?t=${Date.now()}`, { cache: "no-cache" });
+        if (response.ok) {
+          const config = validateState(await response.json());
+          if (config) {
+            publishedState = config;
+          }
+        }
+      } catch {
+        publishedState = cloneState(FALLBACK_STATE);
+      }
+
+      const localOverride = readLocalOverride();
+      hasLocalOverride = Boolean(localOverride);
+      state = localOverride || cloneState(publishedState);
+      render();
     }
 
     function render() {
@@ -635,6 +734,9 @@
         button.classList.toggle("active", size === state.gridSize);
         button.setAttribute("aria-pressed", String(size === state.gridSize));
       });
+
+      resetPublished.disabled = !hasLocalOverride;
+      resetPublished.title = hasLocalOverride ? "Discard this device's local changes" : "Already using the published app list";
 
       if (!settingsMode && visibleApps.length === 0) {
         const empty = document.createElement("div");
@@ -822,7 +924,10 @@
       }
     });
 
+    resetPublished.addEventListener("click", clearLocalOverride);
+
     render();
+    initializeState();
   </script>
 </body>
 </html>

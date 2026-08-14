@@ -4,6 +4,8 @@ GitHub Pages is the preferred first deployment target for Kousen CommandCenter.
 
 The app is a static `index.html`, so GitHub Pages can serve it directly from the repository root. No build step is required.
 
+Shared app cards are defined in `apps.json`. Updating that file and pushing to `main` updates the published CommandCenter app list.
+
 ## Cost
 
 GitHub Pages is available for public repositories on GitHub Free. This project can use GitHub Pages without an extra hosting fee as long as the repository remains public.
@@ -74,3 +76,13 @@ Plex     -> http://192.168.10.10:32400/web
 
 The internet is only used to load CommandCenter and any internet-backed widgets. Media playback from LAN apps remains local after the user navigates to those LAN URLs.
 
+## Shared App Updates
+
+To update the app cards for every device:
+
+1. Edit `apps.json`.
+2. Commit the change.
+3. Push to `main`.
+4. Wait for GitHub Pages to deploy.
+
+Devices that have local settings overrides will keep those overrides until someone opens settings and clicks **Reset to Published**.
