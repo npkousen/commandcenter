@@ -1,6 +1,8 @@
-# Deployment Strategy
+# Optional TrueNAS Deployment Strategy
 
-This project is designed to deploy as a tiny static nginx container.
+This project can deploy as a tiny static nginx container if a LAN-hosted or internet-independent version is needed later.
+
+The preferred first deployment target is GitHub Pages. See `docs/github-pages.md`.
 
 ## Target Topology
 
@@ -43,7 +45,7 @@ The easiest Git-driven deployment path is:
 4. TrueNAS runs that published image.
 5. TrueNAS pulls the new image when updated.
 
-The workflow is in `.github/workflows/publish-image.yml`.
+The workflow is in `.github/workflows/publish-image.yml`. It is manual-only because GitHub Pages is the primary deployment path.
 
 The deployment compose file is already pointed at this repo's expected GHCR image:
 
