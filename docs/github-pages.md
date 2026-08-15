@@ -85,4 +85,4 @@ To update the app cards for every device:
 3. Push to `main`.
 4. Wait for GitHub Pages to deploy.
 
-Devices that have local settings overrides will keep those overrides until someone opens settings and clicks **Reset to Published**.
+Devices that have local settings overrides will keep those overrides until someone opens settings and clicks **Reset to Defaults**.
