@@ -563,8 +563,9 @@
 
     .upload-panel {
       display: grid;
-      grid-template-columns: minmax(128px, 168px) minmax(132px, 1fr);
+      grid-template-columns: minmax(128px, 168px) minmax(128px, 168px);
       align-items: stretch;
+      justify-content: center;
       gap: 12px;
     }
 
@@ -592,6 +593,10 @@
       display: grid;
       align-content: center;
       gap: 10px;
+    }
+
+    .upload-actions .secondary {
+      width: 100%;
     }
 
     .file-input {
@@ -700,6 +705,9 @@
       </div>
       <div class="top-actions">
         <div class="history-actions" aria-label="History controls">
+          <button class="toolbar-button" id="exportButton" type="button" aria-label="Export setup" title="Export Setup"></button>
+          <button class="toolbar-button" id="importButton" type="button" aria-label="Import setup" title="Import Setup"></button>
+          <input class="file-input" id="importFileInput" type="file" accept="application/json,.json">
           <button class="toolbar-button" id="undoButton" type="button" aria-label="Undo" title="Undo"></button>
           <button class="toolbar-button" id="redoButton" type="button" aria-label="Redo" title="Redo"></button>
         </div>
@@ -740,18 +748,17 @@
         <input type="hidden" id="editingId">
 
         <div class="field">
-          <label for="nameInput">App name</label>
+          <label for="nameInput">App Name</label>
           <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
         </div>
 
         <div class="field">
           <label for="urlInput">URL</label>
           <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
-          <p class="hint">Include the port when the app is not using standard HTTP or HTTPS.</p>
         </div>
 
         <div class="field">
-          <label>App logo</label>
+          <label>App Logo</label>
           <div class="upload-panel">
             <div class="image-preview" id="logoPreview">No logo selected</div>
             <input class="file-input" id="logoFileInput" type="file" accept="image/*">
@@ -763,15 +770,15 @@
         </div>
 
         <div class="field">
-          <label for="colorInput">Card color</label>
+          <label for="colorInput">Card Color</label>
           <select id="colorInput" name="color">
-            <option value="#2563eb">Blue</option>
-            <option value="#16a34a">Green</option>
-            <option value="#dc2626">Red</option>
-            <option value="#d97706">Amber</option>
-            <option value="#7c3aed">Violet</option>
-            <option value="#0f766e">Teal</option>
-            <option value="#475569">Graphite</option>
+            <option value="#2563eb" style="color: #2563eb;">■ Blue</option>
+            <option value="#16a34a" style="color: #16a34a;">■ Green</option>
+            <option value="#dc2626" style="color: #dc2626;">■ Red</option>
+            <option value="#d97706" style="color: #d97706;">■ Amber</option>
+            <option value="#7c3aed" style="color: #7c3aed;">■ Violet</option>
+            <option value="#0f766e" style="color: #0f766e;">■ Teal</option>
+            <option value="#475569" style="color: #475569;">■ Graphite</option>
           </select>
         </div>
 
@@ -823,7 +830,7 @@
       </div>
       <div class="form">
         <div class="upload-panel">
-          <div class="image-preview" id="backgroundPreview">No background image selected</div>
+          <div class="image-preview" id="backgroundPreview">No image</div>
           <input class="file-input" id="backgroundFileInput" type="file" accept="image/*">
           <div class="upload-actions">
             <button class="secondary" id="backgroundUploadButton" type="button"></button>
@@ -838,7 +845,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.6</div>
+  <div class="version">Version 0.1.7</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -876,6 +883,8 @@
       add: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>',
       moveLeft: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
       moveRight: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+      export: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>',
+      import: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/></svg>',
       undo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>',
       redo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"/></svg>',
       columns2: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>',
@@ -891,6 +900,9 @@
     const main = document.querySelector(".main");
     const appGrid = document.getElementById("appGrid");
     const settingsToggle = document.getElementById("settingsToggle");
+    const exportButton = document.getElementById("exportButton");
+    const importButton = document.getElementById("importButton");
+    const importFileInput = document.getElementById("importFileInput");
     const undoButton = document.getElementById("undoButton");
     const redoButton = document.getElementById("redoButton");
     const backgroundButton = document.getElementById("backgroundButton");
@@ -1030,6 +1042,50 @@
       state = redoStack.pop();
       saveState();
       render();
+    }
+
+    function exportSetup() {
+      const payload = {
+        commandCenter: "Kousen.CommandCenter",
+        version: "0.1.7",
+        exportedAt: new Date().toISOString(),
+        ...cloneState(state)
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "kousen-commandcenter-setup.json";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    function importSetup(file) {
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        try {
+          const parsed = JSON.parse(String(reader.result || ""));
+          const importedState = validateState(parsed.state || parsed);
+
+          if (!importedState) {
+            window.alert("That JSON file is not a valid CommandCenter setup.");
+            return;
+          }
+
+          commitState(() => {
+            state = importedState;
+          });
+        } catch {
+          window.alert("That JSON file could not be imported.");
+        } finally {
+          importFileInput.value = "";
+        }
+      });
+      reader.readAsText(file);
     }
 
     function clearLocalOverride() {
@@ -1319,7 +1375,7 @@
 
     function openBackgroundDialog() {
       pendingBackgroundImage = state.backgroundImage || "";
-      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
       backgroundBackdrop.classList.add("open");
       backgroundUploadButton.focus();
     }
@@ -1383,6 +1439,8 @@
 
     function installIcons() {
       setIcon(settingsToggle, ICONS.settings);
+      setIcon(exportButton, ICONS.export);
+      setIcon(importButton, ICONS.import);
       setIcon(undoButton, ICONS.undo);
       setIcon(redoButton, ICONS.redo);
       setIcon(backgroundButton, ICONS.wallpaper);
@@ -1410,6 +1468,8 @@
         accentButton,
         ...getColumnButtons(),
         resetPublished,
+        exportButton,
+        importButton,
         undoButton,
         redoButton,
         settingsToggle
@@ -1433,6 +1493,12 @@
           state.columns = columns;
         });
       });
+    });
+
+    exportButton.addEventListener("click", exportSetup);
+    importButton.addEventListener("click", () => importFileInput.click());
+    importFileInput.addEventListener("change", () => {
+      importSetup(importFileInput.files[0]);
     });
 
     appForm.addEventListener("submit", (event) => {
@@ -1509,12 +1575,12 @@
     backgroundClearButton.addEventListener("click", () => {
       pendingBackgroundImage = "";
       backgroundFileInput.value = "";
-      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
     });
     backgroundFileInput.addEventListener("change", () => {
       readImageFile(backgroundFileInput.files[0], (image) => {
         pendingBackgroundImage = image;
-        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
       });
     });
     cancelBackground.addEventListener("click", closeBackgroundDialog);

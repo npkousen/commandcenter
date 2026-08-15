@@ -50,6 +50,7 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - The top-right settings button toggles edit mode.
 - Edit mode shows column controls for `2`, `3`, and `4` columns.
 - Edit mode shows undo and redo controls for changes made during the current browser session.
+- Edit mode can export the current setup to JSON and import that setup later or on another device.
 - Edit mode includes controls for the CommandCenter accent color and background image.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
