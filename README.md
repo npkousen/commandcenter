@@ -53,10 +53,12 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Edit mode can export the current setup to JSON and import that setup later or on another device.
 - Edit mode includes an Edit Homepage control for the CommandCenter name, accent color, background color, background image, and image dim level.
 - Edit mode shows green add buttons in empty grid slots.
-- App cards open their configured URL in the same browser tab.
+- Link app cards open their configured URL in the same browser tab.
+- Weather and clock app cards render as live homepage widgets.
 - Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
 - Existing cards can be reordered left or right while settings mode is on.
 - App cards can use initials or a custom uploaded logo.
+- Weather widgets use a ZIP code and refresh cadence. Clock widgets use a timezone and digital or analog display mode.
 - Published/shared app cards are defined in `apps.json`.
 - Settings changes made in the browser are stored as local overrides for that device.
 - The settings panel can reset a device back to the published `apps.json` list.
@@ -75,12 +77,12 @@ GitHub Pages will publish the new app list automatically. Devices with no local 
 
 ```json
 {
-  "columns": 2,
+  "columns": 3,
   "homepageName": "Kousen",
-  "accentColor": "#ef4444",
+  "accentColor": "#5ba37d",
   "backgroundColor": "#111827",
   "backgroundImage": "bliss.png",
-  "backgroundTransparency": 50,
+  "backgroundTransparency": 25,
   "apps": []
 }
 ```

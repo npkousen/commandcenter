@@ -272,6 +272,10 @@
       outline-offset: 3px;
     }
 
+    .reset-button[aria-disabled="true"] {
+      opacity: 0.55;
+    }
+
     .grid-wrap {
       min-height: 0;
       height: 100%;
@@ -381,6 +385,54 @@
       font-size: clamp(0.92rem, calc(var(--cell-size) * 0.07), 1.65rem);
       font-weight: 740;
       line-height: 1.18;
+    }
+
+    .widget-content {
+      gap: clamp(6px, 1vw, 10px);
+    }
+
+    .widget-primary {
+      font-size: clamp(1.5rem, calc(var(--cell-size) * 0.14), 3.2rem);
+      line-height: 1;
+      font-weight: 820;
+    }
+
+    .widget-secondary {
+      color: rgba(248, 250, 252, 0.86);
+      font-size: clamp(0.78rem, calc(var(--cell-size) * 0.052), 1.12rem);
+      line-height: 1.2;
+    }
+
+    .clock-analog {
+      width: clamp(64px, calc(var(--cell-size) * 0.38), 136px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.86);
+      position: relative;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .clock-analog::before,
+    .clock-analog::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 50%;
+      width: 4px;
+      border-radius: 999px;
+      background: #ffffff;
+      transform-origin: bottom center;
+    }
+
+    .clock-analog::before {
+      height: 28%;
+      transform: translateX(-50%) rotate(var(--hour-angle, 0deg));
+    }
+
+    .clock-analog::after {
+      height: 38%;
+      width: 3px;
+      transform: translateX(-50%) rotate(var(--minute-angle, 0deg));
     }
 
     .move-actions,
@@ -534,6 +586,41 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.10);
     }
 
+    .dialog-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 16px;
+    }
+
+    .dialog-mode-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dialog-mode-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+    }
+
+    .dialog-mode-button.active {
+      color: var(--accent);
+    }
+
+    .dialog-mode-button:focus-visible,
+    .dialog-mode-button.remote-focus {
+      outline: 4px solid #ffffff;
+      outline-offset: 3px;
+    }
+
     .dialog-title {
       margin: 0;
       font-size: 1.12rem;
@@ -548,6 +635,10 @@
     .field {
       display: grid;
       gap: 7px;
+    }
+
+    .field.hidden {
+      display: none;
     }
 
     .field label {
@@ -612,7 +703,11 @@
     .keyboard-button:focus-visible,
     .keyboard-button.remote-focus,
     .virtual-key:focus-visible,
-    .virtual-key.remote-focus {
+    .virtual-key.remote-focus,
+    .toggle-option:focus-visible,
+    .toggle-option.remote-focus,
+    .transparency-button:focus-visible,
+    .transparency-button.remote-focus {
       outline: 4px solid #ffffff;
       outline-offset: 3px;
     }
@@ -733,7 +828,8 @@
       gap: 6px;
     }
 
-    .transparency-button {
+    .transparency-button,
+    .toggle-option {
       min-height: 34px;
       border-radius: 6px;
       color: var(--text);
@@ -743,9 +839,20 @@
       font-weight: 720;
     }
 
-    .transparency-button.active {
+    .transparency-button.active,
+    .toggle-option.active {
       background: var(--accent);
       color: var(--text);
+    }
+
+    .toggle-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .toggle-group.two {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .transparency-label {
@@ -838,7 +945,6 @@
     .primary:hover,
     .primary:focus-visible {
       background: #3ee173;
-      outline: none;
     }
 
     .danger {
@@ -940,21 +1046,28 @@
   <div class="modal-backdrop" id="modalBackdrop" role="presentation">
     <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
       <div class="dialog-header">
-        <h2 class="dialog-title" id="dialogTitle">Add App</h2>
+        <div class="dialog-title-row">
+          <h2 class="dialog-title" id="dialogTitle">Add App</h2>
+          <div class="dialog-mode-actions" aria-label="App type">
+            <button class="dialog-mode-button" id="weatherModeButton" type="button" aria-label="Weather app" title="Weather App"></button>
+            <button class="dialog-mode-button" id="clockModeButton" type="button" aria-label="Clock app" title="Clock App"></button>
+          </div>
+        </div>
       </div>
       <form class="form" id="appForm">
         <input type="hidden" id="slotInput">
         <input type="hidden" id="editingId">
+        <input type="hidden" id="appTypeInput" value="link">
 
-        <div class="field">
-          <label for="nameInput">App Name</label>
+        <div class="field" id="nameField">
+          <label for="nameInput" id="nameInputLabel">App Name</label>
           <div class="text-entry-row">
             <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
             <button class="keyboard-button" id="nameKeyboardButton" type="button" aria-label="Open keyboard for app name" title="Open Keyboard"></button>
           </div>
         </div>
 
-        <div class="field">
+        <div class="field" id="urlField">
           <label for="urlInput">URL</label>
           <div class="text-entry-row">
             <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
@@ -962,7 +1075,24 @@
           </div>
         </div>
 
-        <div class="field">
+        <div class="field hidden" id="weatherCadenceField">
+          <label>Update Cadence</label>
+          <div class="toggle-group" role="group" aria-label="Weather update cadence">
+            <button class="toggle-option" type="button" data-cadence="5">5 min</button>
+            <button class="toggle-option" type="button" data-cadence="30">30 min</button>
+            <button class="toggle-option" type="button" data-cadence="60">1 hour</button>
+          </div>
+        </div>
+
+        <div class="field hidden" id="clockStyleField">
+          <label>Clock Style</label>
+          <div class="toggle-group two" role="group" aria-label="Clock style">
+            <button class="toggle-option" type="button" data-clock-style="digital">Digital</button>
+            <button class="toggle-option" type="button" data-clock-style="analog">Analog</button>
+          </div>
+        </div>
+
+        <div class="field" id="logoField">
           <label>App Logo</label>
           <div class="upload-panel">
             <div class="image-preview" id="logoPreview">No logo selected</div>
@@ -974,7 +1104,7 @@
           </div>
         </div>
 
-        <div class="field">
+        <div class="field" id="cardColorField">
           <label for="colorInput">Card Color</label>
           <div class="color-select" data-color-select>
             <input class="color-select-input" id="colorInput" name="color" value="#2563eb">
@@ -1054,7 +1184,7 @@
         <div class="field">
           <label>Background Image</label>
           <div class="upload-panel">
-            <div class="image-preview" id="backgroundPreview">No image</div>
+            <div class="image-preview" id="backgroundPreview">No image selected</div>
             <input class="file-input" id="backgroundFileInput" type="file" accept="image/*">
             <div class="upload-actions">
               <button class="secondary" id="backgroundUploadButton" type="button"></button>
@@ -1113,20 +1243,20 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.9</div>
+  <div class="version">Version 0.1.10</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
     const LEGACY_STORAGE_KEY = "kousen-commandcenter:v1";
     const CONFIG_URL = "apps.json";
     const COLUMN_OPTIONS = [2, 3, 4];
-    const DEFAULT_ACCENT_COLOR = "#ef4444";
+    const DEFAULT_ACCENT_COLOR = "#5ba37d";
     const DEFAULT_BACKGROUND_COLOR = "#111827";
     const DEFAULT_BACKGROUND_IMAGE = "bliss.png";
     const DEFAULT_HOMEPAGE_NAME = "Kousen";
-    const DEFAULT_BACKGROUND_TRANSPARENCY = 50;
+    const DEFAULT_BACKGROUND_TRANSPARENCY = 25;
     const FALLBACK_STATE = {
-      columns: 2,
+      columns: 3,
       homepageName: DEFAULT_HOMEPAGE_NAME,
       accentColor: DEFAULT_ACCENT_COLOR,
       backgroundColor: DEFAULT_BACKGROUND_COLOR,
@@ -1168,7 +1298,9 @@
       wallpaper: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v4"/><path d="M8 21h8"/><path d="m9 17 6.1-6.1a2 2 0 0 1 2.81.01L22 15"/><circle cx="8" cy="9" r="2"/><rect x="2" y="3" width="20" height="14" rx="2"/></svg>',
       imageUp: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"/><path d="m14 19.5 3-3 3 3"/><path d="M17 22v-5.5"/><circle cx="9" cy="9" r="2"/></svg>',
       trash: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
-      keyboard: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>'
+      keyboard: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>',
+      weather: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/></svg>',
+      clock: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'
     };
 
     const shell = document.getElementById("appShell");
@@ -1188,10 +1320,20 @@
     const cancelDialog = document.getElementById("cancelDialog");
     const slotInput = document.getElementById("slotInput");
     const editingId = document.getElementById("editingId");
+    const appTypeInput = document.getElementById("appTypeInput");
+    const weatherModeButton = document.getElementById("weatherModeButton");
+    const clockModeButton = document.getElementById("clockModeButton");
+    const nameField = document.getElementById("nameField");
+    const nameInputLabel = document.getElementById("nameInputLabel");
     const nameInput = document.getElementById("nameInput");
     const nameKeyboardButton = document.getElementById("nameKeyboardButton");
+    const urlField = document.getElementById("urlField");
     const urlInput = document.getElementById("urlInput");
     const urlKeyboardButton = document.getElementById("urlKeyboardButton");
+    const weatherCadenceField = document.getElementById("weatherCadenceField");
+    const clockStyleField = document.getElementById("clockStyleField");
+    const logoField = document.getElementById("logoField");
+    const cardColorField = document.getElementById("cardColorField");
     const colorInput = document.getElementById("colorInput");
     const logoPreview = document.getElementById("logoPreview");
     const logoFileInput = document.getElementById("logoFileInput");
@@ -1228,11 +1370,16 @@
     let undoStack = [];
     let redoStack = [];
     let currentLogo = "";
+    let currentAppType = "link";
+    let currentWeatherCadence = 30;
+    let currentClockStyle = "digital";
     let pendingBackgroundImage = "";
     let pendingBackgroundColor = DEFAULT_BACKGROUND_COLOR;
     let pendingBackgroundTransparency = DEFAULT_BACKGROUND_TRANSPARENCY;
     let pendingDeleteId = "";
     let keyboardTargetInput = null;
+    let weatherCache = {};
+    let weatherRefreshTimers = {};
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
@@ -1252,20 +1399,36 @@
           return;
         }
 
+        const type = normalizeAppType(app.type);
         const name = String(app.name || "").trim();
         const url = String(app.url || "").trim();
+        const zip = normalizeZip(app.zip || app.name);
+        const timezone = normalizeTimezone(app.timezone || app.name);
 
-        if (!name || !url) {
+        if (type === "link" && (!name || !url)) {
+          return;
+        }
+
+        if (type === "weather" && !zip) {
+          return;
+        }
+
+        if (type === "clock" && !timezone) {
           return;
         }
 
         usedSlots.add(app.slot);
         apps.push({
           id: String(app.id || createId()),
-          name: name.slice(0, 36),
-          url: normalizeUrl(url),
+          type,
+          name: normalizeAppName(type, name, zip, timezone),
+          url: type === "link" ? normalizeUrl(url) : "",
           color: String(app.color || "#2563eb"),
           logo: String(app.logo || ""),
+          zip,
+          cadence: normalizeCadence(app.cadence),
+          timezone,
+          clockStyle: normalizeClockStyle(app.clockStyle),
           slot: app.slot
         });
       });
@@ -1312,6 +1475,43 @@
     function normalizeHomepageName(value) {
       const name = String(value || DEFAULT_HOMEPAGE_NAME).trim().slice(0, 32);
       return name || DEFAULT_HOMEPAGE_NAME;
+    }
+
+    function normalizeAppType(value) {
+      return ["weather", "clock"].includes(value) ? value : "link";
+    }
+
+    function normalizeAppName(type, name, zip, timezone) {
+      if (type === "weather") return `Weather ${zip}`.slice(0, 36);
+      if (type === "clock") return timezone.slice(0, 36);
+      return name.slice(0, 36);
+    }
+
+    function normalizeZip(value) {
+      return String(value || "").trim().slice(0, 16);
+    }
+
+    function normalizeCadence(value) {
+      const cadence = Number(value);
+      return [5, 30, 60].includes(cadence) ? cadence : 30;
+    }
+
+    function normalizeTimezone(value) {
+      return String(value || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York").trim().slice(0, 48);
+    }
+
+    function getUsableTimezone(value) {
+      const timezone = normalizeTimezone(value);
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format(new Date());
+        return timezone;
+      } catch {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+      }
+    }
+
+    function normalizeClockStyle(value) {
+      return value === "analog" ? "analog" : "digital";
     }
 
     function normalizeColor(value, fallback) {
@@ -1373,7 +1573,7 @@
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.1.9",
+        version: "0.1.10",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -1467,7 +1667,8 @@
         button.setAttribute("aria-pressed", String(size === columns));
       });
 
-      resetPublished.disabled = !hasLocalOverride;
+      resetPublished.disabled = false;
+      resetPublished.setAttribute("aria-disabled", String(!hasLocalOverride));
       resetPublished.title = hasLocalOverride ? "Discard this device's local changes" : "Already using the published app list";
       updateHistoryButtons();
 
@@ -1495,6 +1696,7 @@
       }
 
       queueGridMetrics();
+      syncWidgetTimers();
       restoreUsefulFocus();
     }
 
@@ -1569,13 +1771,18 @@
     }
 
     function createAppCard(app) {
-      const link = document.createElement("a");
+      const isLink = normalizeAppType(app.type) === "link";
+      const link = document.createElement(isLink ? "a" : "div");
       link.className = "app-card";
-      link.href = normalizeUrl(app.url);
+      if (isLink) {
+        link.href = normalizeUrl(app.url);
+      }
       link.dataset.slot = String(app.slot);
+      link.dataset.appId = app.id;
+      link.dataset.appType = normalizeAppType(app.type);
       link.tabIndex = settingsMode ? -1 : 0;
       link.style.setProperty("--card-color", app.color || "#2563eb");
-      link.setAttribute("aria-label", `Open ${app.name}`);
+      link.setAttribute("aria-label", isLink ? `Open ${app.name}` : `${app.name} widget`);
 
       const orderedApps = getOrderedApps();
       const orderIndex = orderedApps.findIndex((item) => item.id === app.id);
@@ -1647,6 +1854,33 @@
 
       actions.append(editButton, deleteButton);
 
+      const content = createAppContent(app);
+      link.append(moveActions, actions, content);
+
+      link.addEventListener("click", (event) => {
+        if (settingsMode || !isLink) {
+          event.preventDefault();
+        }
+      });
+
+      return link;
+    }
+
+    function createAppContent(app) {
+      const type = normalizeAppType(app.type);
+      if (type === "weather") {
+        requestWeather(app);
+        return createWeatherContent(app);
+      }
+
+      if (type === "clock") {
+        return createClockContent(app);
+      }
+
+      return createLinkContent(app);
+    }
+
+    function createLinkContent(app) {
       const content = document.createElement("span");
       content.className = "app-content";
 
@@ -1666,15 +1900,36 @@
       name.textContent = app.name;
 
       content.append(icon, name);
-      link.append(moveActions, actions, content);
+      return content;
+    }
 
-      link.addEventListener("click", (event) => {
-        if (settingsMode) {
-          event.preventDefault();
-        }
-      });
+    function createWeatherContent(app) {
+      const content = document.createElement("span");
+      content.className = "app-content widget-content";
+      const weather = weatherCache[app.id];
+      const primary = document.createElement("span");
+      primary.className = "widget-primary";
+      primary.textContent = weather?.temperature != null ? `${Math.round(weather.temperature)}°` : "--°";
 
-      return link;
+      const condition = document.createElement("span");
+      condition.className = "widget-secondary";
+      condition.textContent = weather?.condition || "Weather";
+
+      const location = document.createElement("span");
+      location.className = "widget-secondary";
+      location.textContent = weather?.location || normalizeZip(app.zip);
+
+      content.append(primary, condition, location);
+      return content;
+    }
+
+    function createClockContent(app) {
+      const content = document.createElement("span");
+      content.className = "app-content widget-content clock-widget";
+      content.dataset.timezone = normalizeTimezone(app.timezone);
+      content.dataset.clockStyle = normalizeClockStyle(app.clockStyle);
+      renderClockContent(content);
+      return content;
     }
 
     function createAddButton(slot) {
@@ -1692,13 +1947,19 @@
       dialogTitle.textContent = app ? "Edit App" : "Add App";
       slotInput.value = String(slot);
       editingId.value = app ? app.id : "";
-      nameInput.value = app ? app.name : "";
+      const appType = normalizeAppType(app?.type);
+      currentAppType = appType;
+      currentWeatherCadence = normalizeCadence(app?.cadence);
+      currentClockStyle = normalizeClockStyle(app?.clockStyle);
+      appTypeInput.value = appType;
+      nameInput.value = appType === "weather" ? normalizeZip(app?.zip) : appType === "clock" ? normalizeTimezone(app?.timezone) : app ? app.name : "";
       urlInput.value = app ? app.url : "";
       setColorSelectValue(colorInput, app ? app.color : "#2563eb");
       currentLogo = app ? app.logo || "" : "";
       renderImagePreview(logoPreview, currentLogo, "No logo selected");
+      updateAppModeFields();
       modalBackdrop.classList.add("open");
-      nameInput.focus();
+      focusTarget(nameInput);
     }
 
     function closeDialogBox() {
@@ -1706,16 +1967,57 @@
       appForm.reset();
       editingId.value = "";
       slotInput.value = "";
+      appTypeInput.value = "link";
+      currentAppType = "link";
+      currentWeatherCadence = 30;
+      currentClockStyle = "digital";
       currentLogo = "";
       renderImagePreview(logoPreview, "", "No logo selected");
       closeColorSelects();
+    }
+
+    function setAppMode(type) {
+      const previousType = currentAppType;
+      currentAppType = currentAppType === type ? "link" : normalizeAppType(type);
+      appTypeInput.value = currentAppType;
+      if (currentAppType === "weather" && previousType !== "weather") {
+        nameInput.value = "10001";
+      }
+      if (currentAppType === "clock" && previousType !== "clock") {
+        nameInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+      }
+      updateAppModeFields();
+      focusTarget(nameInput);
+    }
+
+    function updateAppModeFields() {
+      const type = normalizeAppType(appTypeInput.value);
+      weatherModeButton.classList.toggle("active", type === "weather");
+      weatherModeButton.setAttribute("aria-pressed", String(type === "weather"));
+      clockModeButton.classList.toggle("active", type === "clock");
+      clockModeButton.setAttribute("aria-pressed", String(type === "clock"));
+      nameInputLabel.textContent = type === "weather" ? "Zip Code" : type === "clock" ? "Timezone" : "App Name";
+      nameInput.placeholder = type === "weather" ? "10001" : type === "clock" ? "America/New_York" : "KousenTV";
+      urlField.classList.toggle("hidden", type !== "link");
+      urlInput.required = type === "link";
+      logoField.classList.toggle("hidden", type !== "link");
+      weatherCadenceField.classList.toggle("hidden", type !== "weather");
+      clockStyleField.classList.toggle("hidden", type !== "clock");
+      document.querySelectorAll("[data-cadence]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.cadence) === currentWeatherCadence);
+        button.setAttribute("aria-pressed", String(Number(button.dataset.cadence) === currentWeatherCadence));
+      });
+      document.querySelectorAll("[data-clock-style]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.clockStyle === currentClockStyle);
+        button.setAttribute("aria-pressed", String(button.dataset.clockStyle === currentClockStyle));
+      });
     }
 
     function openDeleteDialog(app) {
       pendingDeleteId = app.id;
       deleteMessage.textContent = `Delete ${app.name} from CommandCenter?`;
       deleteBackdrop.classList.add("open");
-      cancelDelete.focus();
+      focusTarget(cancelDelete);
     }
 
     function closeDeleteDialog() {
@@ -1730,7 +2032,7 @@
       pendingBackgroundImage = state.backgroundImage || "";
       pendingBackgroundColor = normalizeColor(state.backgroundColor, DEFAULT_BACKGROUND_COLOR);
       pendingBackgroundTransparency = normalizeTransparency(state.backgroundTransparency);
-      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
       updateTransparencyButtons();
       backgroundBackdrop.classList.add("open");
       focusTarget(homepageNameInput);
@@ -1933,6 +2235,156 @@
         .join("") || "?";
     }
 
+    function syncWidgetTimers() {
+      Object.entries(weatherRefreshTimers).forEach(([appId, entry]) => {
+        if (!state.apps.some((app) => app.id === appId && normalizeAppType(app.type) === "weather")) {
+          clearInterval(entry.timer);
+          delete weatherRefreshTimers[appId];
+          delete weatherCache[appId];
+        }
+      });
+
+      state.apps
+        .filter((app) => normalizeAppType(app.type) === "weather")
+        .forEach((app) => {
+          const cadence = normalizeCadence(app.cadence);
+          if (!weatherRefreshTimers[app.id] || weatherRefreshTimers[app.id].cadence !== cadence) {
+            if (weatherRefreshTimers[app.id]) {
+              clearInterval(weatherRefreshTimers[app.id].timer);
+            }
+            requestWeather(app);
+            weatherRefreshTimers[app.id] = {
+              cadence,
+              timer: setInterval(() => requestWeather(app), cadence * 60 * 1000)
+            };
+          }
+        });
+
+      updateClockWidgets();
+    }
+
+    async function requestWeather(app) {
+      const zip = normalizeZip(app.zip);
+      if (!zip || weatherCache[app.id]?.loading) {
+        return;
+      }
+
+      weatherCache[app.id] = { ...(weatherCache[app.id] || {}), loading: true };
+      try {
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(zip)}&count=1&language=en&format=json`;
+        const geoResponse = await fetch(geoUrl);
+        const geo = await geoResponse.json();
+        const location = geo?.results?.[0];
+        if (!location) {
+          throw new Error("No location found");
+        }
+
+        const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
+        forecastUrl.searchParams.set("latitude", location.latitude);
+        forecastUrl.searchParams.set("longitude", location.longitude);
+        forecastUrl.searchParams.set("current", "temperature_2m,weather_code");
+        forecastUrl.searchParams.set("temperature_unit", "fahrenheit");
+        forecastUrl.searchParams.set("timezone", "auto");
+        const forecastResponse = await fetch(forecastUrl);
+        const forecast = await forecastResponse.json();
+        weatherCache[app.id] = {
+          temperature: forecast?.current?.temperature_2m,
+          condition: weatherCodeLabel(forecast?.current?.weather_code),
+          location: location.name || zip,
+          loading: false,
+          updatedAt: Date.now()
+        };
+      } catch {
+        weatherCache[app.id] = {
+          condition: "Unavailable",
+          location: zip,
+          loading: false,
+          updatedAt: Date.now()
+        };
+      }
+
+      updateWeatherCard(app.id);
+    }
+
+    function weatherCodeLabel(code) {
+      const labels = {
+        0: "Clear",
+        1: "Mostly Clear",
+        2: "Partly Cloudy",
+        3: "Cloudy",
+        45: "Fog",
+        48: "Fog",
+        51: "Drizzle",
+        53: "Drizzle",
+        55: "Drizzle",
+        61: "Rain",
+        63: "Rain",
+        65: "Rain",
+        71: "Snow",
+        73: "Snow",
+        75: "Snow",
+        80: "Showers",
+        81: "Showers",
+        82: "Showers",
+        95: "Storms"
+      };
+      return labels[code] || "Weather";
+    }
+
+    function updateWeatherCard(appId) {
+      const app = state.apps.find((item) => item.id === appId);
+      const card = document.querySelector(`.app-card[data-app-id="${appId}"]`);
+      if (!app || !card) {
+        return;
+      }
+
+      const existingContent = card.querySelector(".app-content");
+      existingContent?.replaceWith(createWeatherContent(app));
+    }
+
+    function updateClockWidgets() {
+      document.querySelectorAll(".clock-widget").forEach((content) => renderClockContent(content));
+    }
+
+    function renderClockContent(content) {
+      const timezone = getUsableTimezone(content.dataset.timezone);
+      const style = normalizeClockStyle(content.dataset.clockStyle);
+      const now = new Date();
+
+      content.innerHTML = "";
+      if (style === "analog") {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: timezone,
+          hour: "numeric",
+          minute: "numeric",
+          hour12: false
+        }).formatToParts(now);
+        const hour = Number(parts.find((part) => part.type === "hour")?.value || 0);
+        const minute = Number(parts.find((part) => part.type === "minute")?.value || 0);
+        const face = document.createElement("span");
+        face.className = "clock-analog";
+        face.style.setProperty("--hour-angle", `${((hour % 12) + minute / 60) * 30}deg`);
+        face.style.setProperty("--minute-angle", `${minute * 6}deg`);
+        const label = document.createElement("span");
+        label.className = "widget-secondary";
+        label.textContent = timezone;
+        content.append(face, label);
+        return;
+      }
+
+      const time = document.createElement("span");
+      time.className = "widget-primary";
+      time.textContent = new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(now);
+      const label = document.createElement("span");
+      label.className = "widget-secondary";
+      label.textContent = timezone;
+      content.append(time, label);
+    }
+
     function createId() {
       if (crypto.randomUUID) {
         return crypto.randomUUID();
@@ -1958,6 +2410,8 @@
       setIcon(nameKeyboardButton, ICONS.keyboard);
       setIcon(urlKeyboardButton, ICONS.keyboard);
       setIcon(homepageKeyboardButton, ICONS.keyboard);
+      setIcon(weatherModeButton, ICONS.weather);
+      setIcon(clockModeButton, ICONS.clock);
       document.querySelectorAll(".grid-size").forEach((button) => {
         setIcon(button, ICONS[`columns${button.dataset.columns}`]);
       });
@@ -2013,14 +2467,30 @@
       event.preventDefault();
       const id = editingId.value || createId();
       const slot = Number(slotInput.value);
+      const type = normalizeAppType(appTypeInput.value);
       const app = {
         id,
-        name: nameInput.value.trim(),
-        url: normalizeUrl(urlInput.value),
+        type,
+        name: normalizeAppName(type, nameInput.value.trim(), nameInput.value.trim(), nameInput.value.trim()),
+        url: type === "link" ? normalizeUrl(urlInput.value) : "",
         color: colorInput.value,
-        logo: currentLogo,
+        logo: type === "link" ? currentLogo : "",
+        zip: type === "weather" ? normalizeZip(nameInput.value) : "",
+        cadence: type === "weather" ? currentWeatherCadence : 30,
+        timezone: type === "clock" ? normalizeTimezone(nameInput.value) : "",
+        clockStyle: type === "clock" ? currentClockStyle : "digital",
         slot
       };
+
+      if (type === "weather" && !app.zip) {
+        focusTarget(nameInput);
+        return;
+      }
+
+      if (type === "clock" && !app.timezone) {
+        focusTarget(nameInput);
+        return;
+      }
 
       commitState(() => {
         state.apps = state.apps.filter((item) => item.id !== id && item.slot !== slot);
@@ -2036,7 +2506,25 @@
       }
     });
 
-    logoUploadButton.addEventListener("click", () => logoFileInput.click());
+    weatherModeButton.addEventListener("click", () => setAppMode("weather"));
+    clockModeButton.addEventListener("click", () => setAppMode("clock"));
+    document.querySelectorAll("[data-cadence]").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentWeatherCadence = normalizeCadence(button.dataset.cadence);
+        updateAppModeFields();
+      });
+    });
+    document.querySelectorAll("[data-clock-style]").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentClockStyle = normalizeClockStyle(button.dataset.clockStyle);
+        updateAppModeFields();
+      });
+    });
+
+    logoUploadButton.addEventListener("click", () => {
+      logoFileInput.value = "";
+      logoFileInput.click();
+    });
     logoClearButton.addEventListener("click", () => {
       currentLogo = "";
       logoFileInput.value = "";
@@ -2068,17 +2556,20 @@
     });
 
     backgroundButton.addEventListener("click", openBackgroundDialog);
-    backgroundUploadButton.addEventListener("click", () => backgroundFileInput.click());
+    backgroundUploadButton.addEventListener("click", () => {
+      backgroundFileInput.value = "";
+      backgroundFileInput.click();
+    });
     backgroundClearButton.addEventListener("click", () => {
       pendingBackgroundImage = "";
       backgroundFileInput.value = "";
-      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
       previewHomepageTheme();
     });
     backgroundFileInput.addEventListener("change", () => {
       readImageFile(backgroundFileInput.files[0], (image) => {
         pendingBackgroundImage = image;
-        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
+        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
         previewHomepageTheme();
       });
     });
@@ -2137,9 +2628,14 @@
       handleRemoteNavigation(event);
     });
 
-    resetPublished.addEventListener("click", clearLocalOverride);
+    resetPublished.addEventListener("click", () => {
+      if (hasLocalOverride) {
+        clearLocalOverride();
+      }
+    });
     window.addEventListener("resize", queueGridMetrics);
     window.addEventListener("load", queueGridMetrics);
+    setInterval(updateClockWidgets, 1000);
 
     function getGridGap() {
       return Number.parseFloat(getComputedStyle(appGrid).gap) || 0;
@@ -2308,6 +2804,11 @@
         return gridTarget;
       }
 
+      const sameRowTarget = findSameRowTarget(currentTarget, direction);
+      if (sameRowTarget) {
+        return sameRowTarget;
+      }
+
       const current = getTargetCenter(currentTarget);
       const candidates = getRemoteTargets().filter((target) => target !== currentTarget);
       let bestTarget = null;
@@ -2333,6 +2834,24 @@
       });
 
       return bestTarget;
+    }
+
+    function findSameRowTarget(currentTarget, direction) {
+      if (direction !== "left" && direction !== "right") {
+        return null;
+      }
+
+      const currentRect = currentTarget.getBoundingClientRect();
+      const currentCenter = getTargetCenter(currentTarget);
+      const rowTolerance = Math.max(18, currentRect.height * 0.7);
+      const candidates = getRemoteTargets()
+        .filter((target) => target !== currentTarget)
+        .map((target) => ({ target, center: getTargetCenter(target), rect: target.getBoundingClientRect() }))
+        .filter(({ center }) => Math.abs(center.y - currentCenter.y) <= rowTolerance)
+        .filter(({ center }) => direction === "right" ? center.x > currentCenter.x + 2 : center.x < currentCenter.x - 2)
+        .sort((a, b) => Math.abs(a.center.x - currentCenter.x) - Math.abs(b.center.x - currentCenter.x));
+
+      return candidates[0]?.target || null;
     }
 
     function findGridDirectionalTarget(currentTarget, direction) {

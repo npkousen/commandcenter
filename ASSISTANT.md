@@ -29,3 +29,4 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - Homepage name, accent color, background color, background image, image dim level, and app logos are stored in the same shared/local state model as app cards. Uploaded images are stored as browser data URLs, so keep them small enough for localStorage.
 - `bliss.png` is the default published background image and should stay referenced as an asset rather than embedded in `index.html`.
 - Settings mode supports exporting/importing the current local setup as JSON; imported files must pass the same `validateState` path used for `apps.json`.
+- App records can be `link`, `weather`, or `clock`. Weather widgets use Open-Meteo geocoding/forecast APIs with no API key; clock widgets render locally with `Intl.DateTimeFormat`.

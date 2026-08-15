@@ -1,10 +1,10 @@
 {
-  "columns": 2,
+  "columns": 3,
   "homepageName": "Kousen",
-  "accentColor": "#ef4444",
+  "accentColor": "#5ba37d",
   "backgroundColor": "#111827",
   "backgroundImage": "bliss.png",
-  "backgroundTransparency": 50,
+  "backgroundTransparency": 25,
   "apps": [
     {
       "id": "kousentv",
