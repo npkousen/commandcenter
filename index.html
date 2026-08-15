@@ -16,6 +16,13 @@
       --line: #314156;
       --brand-accent: #ef4444;
       --accent: var(--brand-accent);
+      --bg-base: #111827;
+      --bg-soft: #172033;
+      --bg-dark: #10151f;
+      --bg-glow: #2f80ed;
+      --topbar-bg: rgba(24, 34, 49, 0.88);
+      --bg-base-rgb: 17, 24, 39;
+      --bg-glow-rgb: 47, 128, 237;
       --green: #22c55e;
       --green-dark: #12823a;
       --danger: #ef4444;
@@ -39,10 +46,10 @@
       min-height: 100%;
       margin: 0;
       background:
-        linear-gradient(rgba(17, 24, 39, var(--background-overlay-opacity)), rgba(17, 24, 39, var(--background-overlay-opacity))),
+        linear-gradient(rgba(var(--bg-base-rgb), var(--background-overlay-opacity)), rgba(var(--bg-base-rgb), var(--background-overlay-opacity))),
         var(--background-image),
-        radial-gradient(circle at top left, rgba(47, 128, 237, 0.20), transparent 36rem),
-        linear-gradient(135deg, #111827 0%, #172033 46%, #10151f 100%);
+        radial-gradient(circle at top left, rgba(var(--bg-glow-rgb), 0.24), transparent 36rem),
+        linear-gradient(135deg, var(--bg-base) 0%, var(--bg-soft) 46%, var(--bg-dark) 100%);
       background-size: cover, cover, auto, auto;
       background-position: center, center, center, center;
       background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
@@ -79,7 +86,7 @@
       justify-content: space-between;
       padding: 0 clamp(18px, 4vw, 52px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(24, 34, 49, 0.88);
+      background: var(--topbar-bg);
       backdrop-filter: blur(16px);
     }
 
@@ -184,7 +191,7 @@
     .controls {
       display: none;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 16px;
       min-height: 42px;
     }
@@ -561,9 +568,11 @@
     }
 
     .field input:focus,
-    .field select:focus {
+    .field input.remote-focus,
+    .field select:focus,
+    .field select.remote-focus {
       border-color: rgba(47, 128, 237, 0.84);
-      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.18);
+      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.18), 0 0 0 6px #ffffff;
     }
 
     .field option {
@@ -590,6 +599,22 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+    }
+
+    .color-select-button:focus-visible,
+    .color-select-button.remote-focus,
+    .secondary:focus-visible,
+    .secondary.remote-focus,
+    .primary:focus-visible,
+    .primary.remote-focus,
+    .danger:focus-visible,
+    .danger.remote-focus,
+    .keyboard-button:focus-visible,
+    .keyboard-button.remote-focus,
+    .virtual-key:focus-visible,
+    .virtual-key.remote-focus {
+      outline: 4px solid #ffffff;
+      outline-offset: 3px;
     }
 
     .color-select-value {
@@ -637,9 +662,29 @@
     }
 
     .color-option:hover,
-    .color-option:focus-visible {
+    .color-option:focus-visible,
+    .color-option.remote-focus {
       background: rgba(255, 255, 255, 0.10);
-      outline: none;
+      outline: 3px solid #ffffff;
+      outline-offset: -2px;
+    }
+
+    .text-entry-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .keyboard-button {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .upload-panel {
@@ -707,6 +752,48 @@
       color: var(--muted);
       font-size: 0.78rem;
       text-align: center;
+    }
+
+    .virtual-keyboard {
+      width: min(680px, 100%);
+    }
+
+    .keyboard-display {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .keyboard-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .virtual-key {
+      min-width: 42px;
+      min-height: 42px;
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-weight: 720;
+    }
+
+    .virtual-key.wide {
+      min-width: 92px;
     }
 
     .upload-actions .secondary {
@@ -861,12 +948,18 @@
 
         <div class="field">
           <label for="nameInput">App Name</label>
-          <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
+          <div class="text-entry-row">
+            <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
+            <button class="keyboard-button" id="nameKeyboardButton" type="button" aria-label="Open keyboard for app name" title="Open Keyboard"></button>
+          </div>
         </div>
 
         <div class="field">
           <label for="urlInput">URL</label>
-          <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
+          <div class="text-entry-row">
+            <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
+            <button class="keyboard-button" id="urlKeyboardButton" type="button" aria-label="Open keyboard for URL" title="Open Keyboard"></button>
+          </div>
         </div>
 
         <div class="field">
@@ -932,7 +1025,10 @@
       <div class="form">
         <div class="field">
           <label for="homepageNameInput">Command Center Name</label>
-          <input id="homepageNameInput" autocomplete="off" maxlength="32" value="Kousen">
+          <div class="text-entry-row">
+            <input id="homepageNameInput" autocomplete="off" maxlength="32" value="Kousen">
+            <button class="keyboard-button" id="homepageKeyboardButton" type="button" aria-label="Open keyboard for Command Center name" title="Open Keyboard"></button>
+          </div>
         </div>
 
         <div class="field">
@@ -969,8 +1065,27 @@
                   <button class="transparency-button" type="button" data-transparency="50">50%</button>
                   <button class="transparency-button" type="button" data-transparency="75">75%</button>
                 </div>
-                <div class="transparency-label">Set Transparency</div>
+                <div class="transparency-label">Image Dim Level</div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="backgroundColorInput">Background Color</label>
+          <div class="color-select" data-color-select>
+            <input class="color-select-input" id="backgroundColorInput" value="#111827">
+            <button class="color-select-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="color-select-value"></span>
+              <span aria-hidden="true">▾</span>
+            </button>
+            <div class="color-select-menu" role="listbox">
+              <button class="color-option" type="button" data-value="#111827" data-label="Slate"><span class="color-swatch" style="--swatch-color: #111827;"></span>Slate</button>
+              <button class="color-option" type="button" data-value="#1e3a8a" data-label="Blue"><span class="color-swatch" style="--swatch-color: #1e3a8a;"></span>Blue</button>
+              <button class="color-option" type="button" data-value="#0f766e" data-label="Teal"><span class="color-swatch" style="--swatch-color: #0f766e;"></span>Teal</button>
+              <button class="color-option" type="button" data-value="#166534" data-label="Green"><span class="color-swatch" style="--swatch-color: #166534;"></span>Green</button>
+              <button class="color-option" type="button" data-value="#581c87" data-label="Violet"><span class="color-swatch" style="--swatch-color: #581c87;"></span>Violet</button>
+              <button class="color-option" type="button" data-value="#3f3f46" data-label="Graphite"><span class="color-swatch" style="--swatch-color: #3f3f46;"></span>Graphite</button>
             </div>
           </div>
         </div>
@@ -982,7 +1097,23 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.8</div>
+  <div class="modal-backdrop" id="keyboardBackdrop" role="presentation">
+    <section class="dialog wide virtual-keyboard" role="dialog" aria-modal="true" aria-labelledby="keyboardTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="keyboardTitle">Keyboard</h2>
+      </div>
+      <div class="form">
+        <input class="keyboard-display" id="keyboardDisplay" autocomplete="off">
+        <div class="keyboard-grid" id="keyboardGrid" aria-label="Virtual keyboard"></div>
+        <div class="actions">
+          <button class="secondary" id="cancelKeyboard" type="button">Cancel</button>
+          <button class="primary" id="applyKeyboard" type="button">Apply</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="version">Version 0.1.9</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -990,13 +1121,16 @@
     const CONFIG_URL = "apps.json";
     const COLUMN_OPTIONS = [2, 3, 4];
     const DEFAULT_ACCENT_COLOR = "#ef4444";
+    const DEFAULT_BACKGROUND_COLOR = "#111827";
+    const DEFAULT_BACKGROUND_IMAGE = "bliss.png";
     const DEFAULT_HOMEPAGE_NAME = "Kousen";
     const DEFAULT_BACKGROUND_TRANSPARENCY = 50;
     const FALLBACK_STATE = {
       columns: 2,
       homepageName: DEFAULT_HOMEPAGE_NAME,
       accentColor: DEFAULT_ACCENT_COLOR,
-      backgroundImage: "",
+      backgroundColor: DEFAULT_BACKGROUND_COLOR,
+      backgroundImage: DEFAULT_BACKGROUND_IMAGE,
       backgroundTransparency: DEFAULT_BACKGROUND_TRANSPARENCY,
       apps: [
         {
@@ -1033,7 +1167,8 @@
       columns4: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7.5 3v18"/><path d="M12 3v18"/><path d="M16.5 3v18"/></svg>',
       wallpaper: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v4"/><path d="M8 21h8"/><path d="m9 17 6.1-6.1a2 2 0 0 1 2.81.01L22 15"/><circle cx="8" cy="9" r="2"/><rect x="2" y="3" width="20" height="14" rx="2"/></svg>',
       imageUp: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"/><path d="m14 19.5 3-3 3 3"/><path d="M17 22v-5.5"/><circle cx="9" cy="9" r="2"/></svg>',
-      trash: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'
+      trash: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+      keyboard: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>'
     };
 
     const shell = document.getElementById("appShell");
@@ -1054,7 +1189,9 @@
     const slotInput = document.getElementById("slotInput");
     const editingId = document.getElementById("editingId");
     const nameInput = document.getElementById("nameInput");
+    const nameKeyboardButton = document.getElementById("nameKeyboardButton");
     const urlInput = document.getElementById("urlInput");
+    const urlKeyboardButton = document.getElementById("urlKeyboardButton");
     const colorInput = document.getElementById("colorInput");
     const logoPreview = document.getElementById("logoPreview");
     const logoFileInput = document.getElementById("logoFileInput");
@@ -1067,13 +1204,20 @@
     const deleteMessage = document.getElementById("deleteMessage");
     const backgroundBackdrop = document.getElementById("backgroundBackdrop");
     const homepageNameInput = document.getElementById("homepageNameInput");
+    const homepageKeyboardButton = document.getElementById("homepageKeyboardButton");
     const homepageAccentInput = document.getElementById("homepageAccentInput");
+    const backgroundColorInput = document.getElementById("backgroundColorInput");
     const backgroundPreview = document.getElementById("backgroundPreview");
     const backgroundFileInput = document.getElementById("backgroundFileInput");
     const backgroundUploadButton = document.getElementById("backgroundUploadButton");
     const backgroundClearButton = document.getElementById("backgroundClearButton");
     const cancelBackground = document.getElementById("cancelBackground");
     const saveBackground = document.getElementById("saveBackground");
+    const keyboardBackdrop = document.getElementById("keyboardBackdrop");
+    const keyboardDisplay = document.getElementById("keyboardDisplay");
+    const keyboardGrid = document.getElementById("keyboardGrid");
+    const cancelKeyboard = document.getElementById("cancelKeyboard");
+    const applyKeyboard = document.getElementById("applyKeyboard");
 
     let publishedState = cloneState(FALLBACK_STATE);
     let state = cloneState(FALLBACK_STATE);
@@ -1085,8 +1229,10 @@
     let redoStack = [];
     let currentLogo = "";
     let pendingBackgroundImage = "";
+    let pendingBackgroundColor = DEFAULT_BACKGROUND_COLOR;
     let pendingBackgroundTransparency = DEFAULT_BACKGROUND_TRANSPARENCY;
     let pendingDeleteId = "";
+    let keyboardTargetInput = null;
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
@@ -1128,10 +1274,39 @@
         columns,
         homepageName: normalizeHomepageName(candidate.homepageName),
         accentColor: normalizeColor(candidate.accentColor, DEFAULT_ACCENT_COLOR),
+        backgroundColor: normalizeColor(candidate.backgroundColor, DEFAULT_BACKGROUND_COLOR),
         backgroundImage: String(candidate.backgroundImage || ""),
         backgroundTransparency: normalizeTransparency(candidate.backgroundTransparency),
         apps
       };
+    }
+
+    function hexToRgb(hex) {
+      const color = normalizeColor(hex, DEFAULT_BACKGROUND_COLOR).replace("#", "");
+      return {
+        r: Number.parseInt(color.slice(0, 2), 16),
+        g: Number.parseInt(color.slice(2, 4), 16),
+        b: Number.parseInt(color.slice(4, 6), 16)
+      };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      return `#${[r, g, b].map((channel) => Math.round(channel).toString(16).padStart(2, "0")).join("")}`;
+    }
+
+    function mixHex(hex, targetHex, amount) {
+      const color = hexToRgb(hex);
+      const target = hexToRgb(targetHex);
+      return rgbToHex({
+        r: color.r + (target.r - color.r) * amount,
+        g: color.g + (target.g - color.g) * amount,
+        b: color.b + (target.b - color.b) * amount
+      });
+    }
+
+    function rgbString(hex) {
+      const { r, g, b } = hexToRgb(hex);
+      return `${r}, ${g}, ${b}`;
     }
 
     function normalizeHomepageName(value) {
@@ -1198,7 +1373,7 @@
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.1.8",
+        version: "0.1.9",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -1269,7 +1444,7 @@
     }
 
     function render() {
-      applyTheme();
+      applyTheme(state);
       const columns = state.columns;
       const visibleApps = state.apps
         .slice()
@@ -1323,15 +1498,43 @@
       restoreUsefulFocus();
     }
 
-    function applyTheme() {
-      const accentColor = normalizeColor(state.accentColor, DEFAULT_ACCENT_COLOR);
-      const homepageName = normalizeHomepageName(state.homepageName);
-      const backgroundTransparency = normalizeTransparency(state.backgroundTransparency);
+    function applyTheme(themeState = state) {
+      const accentColor = normalizeColor(themeState.accentColor, DEFAULT_ACCENT_COLOR);
+      const homepageName = normalizeHomepageName(themeState.homepageName);
+      const backgroundColor = normalizeColor(themeState.backgroundColor, DEFAULT_BACKGROUND_COLOR);
+      const backgroundTransparency = normalizeTransparency(themeState.backgroundTransparency);
+      const softBackground = mixHex(backgroundColor, "#ffffff", 0.10);
+      const darkBackground = mixHex(backgroundColor, "#000000", 0.28);
+      const glowBackground = mixHex(backgroundColor, "#ffffff", 0.34);
+      const topbarBackground = mixHex(backgroundColor, "#ffffff", 0.12);
+
       brandName.textContent = homepageName;
       document.title = `${homepageName}.CommandCenter`;
       document.documentElement.style.setProperty("--brand-accent", accentColor);
-      document.documentElement.style.setProperty("--background-image", state.backgroundImage ? `url(${JSON.stringify(state.backgroundImage)})` : "none");
+      document.documentElement.style.setProperty("--accent", accentColor);
+      document.documentElement.style.setProperty("--bg-base", backgroundColor);
+      document.documentElement.style.setProperty("--bg-soft", softBackground);
+      document.documentElement.style.setProperty("--bg-dark", darkBackground);
+      document.documentElement.style.setProperty("--bg-base-rgb", rgbString(backgroundColor));
+      document.documentElement.style.setProperty("--bg-glow-rgb", rgbString(glowBackground));
+      document.documentElement.style.setProperty("--topbar-bg", `rgba(${rgbString(topbarBackground)}, 0.90)`);
+      document.documentElement.style.setProperty("--background-image", themeState.backgroundImage ? `url(${JSON.stringify(themeState.backgroundImage)})` : "none");
       document.documentElement.style.setProperty("--background-overlay-opacity", String(backgroundTransparency / 100));
+    }
+
+    function previewHomepageTheme() {
+      if (!backgroundBackdrop.classList.contains("open")) {
+        return;
+      }
+
+      applyTheme({
+        ...state,
+        homepageName: homepageNameInput.value,
+        accentColor: homepageAccentInput.value,
+        backgroundColor: backgroundColorInput.value,
+        backgroundImage: pendingBackgroundImage,
+        backgroundTransparency: pendingBackgroundTransparency
+      });
     }
 
     function updateHistoryButtons() {
@@ -1505,6 +1708,7 @@
       slotInput.value = "";
       currentLogo = "";
       renderImagePreview(logoPreview, "", "No logo selected");
+      closeColorSelects();
     }
 
     function openDeleteDialog(app) {
@@ -1522,25 +1726,30 @@
     function openBackgroundDialog() {
       homepageNameInput.value = normalizeHomepageName(state.homepageName);
       setColorSelectValue(homepageAccentInput, normalizeColor(state.accentColor, DEFAULT_ACCENT_COLOR));
+      setColorSelectValue(backgroundColorInput, normalizeColor(state.backgroundColor, DEFAULT_BACKGROUND_COLOR));
       pendingBackgroundImage = state.backgroundImage || "";
+      pendingBackgroundColor = normalizeColor(state.backgroundColor, DEFAULT_BACKGROUND_COLOR);
       pendingBackgroundTransparency = normalizeTransparency(state.backgroundTransparency);
       renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
       updateTransparencyButtons();
       backgroundBackdrop.classList.add("open");
-      homepageNameInput.focus();
+      focusTarget(homepageNameInput);
     }
 
     function closeBackgroundDialog() {
       pendingBackgroundImage = "";
+      pendingBackgroundColor = DEFAULT_BACKGROUND_COLOR;
       pendingBackgroundTransparency = DEFAULT_BACKGROUND_TRANSPARENCY;
       backgroundFileInput.value = "";
       backgroundBackdrop.classList.remove("open");
       closeColorSelects();
+      applyTheme(state);
     }
 
     function updateTransparencyButtons() {
       document.querySelectorAll(".transparency-button").forEach((button) => {
         button.classList.toggle("active", Number(button.dataset.transparency) === pendingBackgroundTransparency);
+        button.setAttribute("aria-pressed", String(Number(button.dataset.transparency) === pendingBackgroundTransparency));
       });
     }
 
@@ -1580,6 +1789,7 @@
       colorSelect.querySelectorAll(".color-option").forEach((option) => {
         option.setAttribute("aria-selected", String(option.dataset.value === selectedColor));
       });
+      input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     function closeColorSelects(except = null) {
@@ -1608,9 +1818,102 @@
           option.addEventListener("click", () => {
             setColorSelectValue(input, option.dataset.value);
             closeColorSelects();
+            focusTarget(toggle);
           });
         });
       });
+    }
+
+    function buildVirtualKeyboard() {
+      const rows = [
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+        ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+        ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+        ["z", "x", "c", "v", "b", "n", "m"],
+        [".", ":", "/", "-", "_", "@"],
+        ["Space", "Backspace", "Clear"]
+      ];
+
+      keyboardGrid.innerHTML = "";
+      rows.forEach((row) => {
+        const rowNode = document.createElement("div");
+        rowNode.className = "keyboard-row";
+
+        row.forEach((key) => {
+          const button = document.createElement("button");
+          button.className = `virtual-key${key.length > 1 ? " wide" : ""}`;
+          button.type = "button";
+          button.dataset.key = key;
+          button.textContent = key;
+          button.addEventListener("click", () => applyVirtualKey(key));
+          rowNode.appendChild(button);
+        });
+
+        keyboardGrid.appendChild(rowNode);
+      });
+    }
+
+    function openVirtualKeyboard(targetInput) {
+      keyboardTargetInput = targetInput;
+      keyboardDisplay.value = targetInput.value;
+      keyboardDisplay.maxLength = targetInput.maxLength > 0 ? targetInput.maxLength : 524288;
+      keyboardBackdrop.classList.add("open");
+      focusTarget(keyboardDisplay);
+    }
+
+    function closeVirtualKeyboard() {
+      const target = keyboardTargetInput;
+      keyboardTargetInput = null;
+      keyboardBackdrop.classList.remove("open");
+      keyboardDisplay.value = "";
+      if (target && document.contains(target) && getActiveModal()) {
+        focusTarget(target);
+      }
+    }
+
+    function applyVirtualKeyboardValue() {
+      if (keyboardTargetInput) {
+        const target = keyboardTargetInput;
+        keyboardTargetInput.value = keyboardDisplay.value;
+        keyboardTargetInput.dispatchEvent(new Event("input", { bubbles: true }));
+        keyboardTargetInput.dispatchEvent(new Event("change", { bubbles: true }));
+        closeVirtualKeyboard();
+        focusTarget(target);
+        return;
+      }
+
+      closeVirtualKeyboard();
+    }
+
+    function appendKeyboardText(text) {
+      const maxLength = keyboardDisplay.maxLength > 0 ? keyboardDisplay.maxLength : Infinity;
+      if (keyboardDisplay.value.length >= maxLength) {
+        return;
+      }
+
+      keyboardDisplay.value = `${keyboardDisplay.value}${text}`.slice(0, maxLength);
+    }
+
+    function focusVirtualKey(key) {
+      const target = Array.from(keyboardGrid.querySelectorAll(".virtual-key")).find((button) => button.dataset.key === key);
+      focusTarget(target);
+    }
+
+    function applyVirtualKey(key) {
+      if (key === "Backspace") {
+        keyboardDisplay.value = keyboardDisplay.value.slice(0, -1);
+        focusVirtualKey(key);
+        return;
+      }
+
+      if (key === "Clear") {
+        keyboardDisplay.value = "";
+        focusVirtualKey(key);
+        return;
+      }
+
+      appendKeyboardText(key === "Space" ? " " : key);
+      focusVirtualKey(key);
     }
 
     function normalizeUrl(rawUrl) {
@@ -1652,6 +1955,9 @@
       setIcon(logoClearButton, ICONS.trash, "Clear Image");
       setIcon(backgroundUploadButton, ICONS.imageUp, "Upload Image");
       setIcon(backgroundClearButton, ICONS.trash, "Clear Image");
+      setIcon(nameKeyboardButton, ICONS.keyboard);
+      setIcon(urlKeyboardButton, ICONS.keyboard);
+      setIcon(homepageKeyboardButton, ICONS.keyboard);
       document.querySelectorAll(".grid-size").forEach((button) => {
         setIcon(button, ICONS[`columns${button.dataset.columns}`]);
       });
@@ -1743,6 +2049,10 @@
       });
     });
 
+    nameKeyboardButton.addEventListener("click", () => openVirtualKeyboard(nameInput));
+    urlKeyboardButton.addEventListener("click", () => openVirtualKeyboard(urlInput));
+    homepageKeyboardButton.addEventListener("click", () => openVirtualKeyboard(homepageNameInput));
+
     cancelDelete.addEventListener("click", closeDeleteDialog);
     deleteBackdrop.addEventListener("click", (event) => {
       if (event.target === deleteBackdrop) {
@@ -1763,18 +2073,27 @@
       pendingBackgroundImage = "";
       backgroundFileInput.value = "";
       renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
+      previewHomepageTheme();
     });
     backgroundFileInput.addEventListener("change", () => {
       readImageFile(backgroundFileInput.files[0], (image) => {
         pendingBackgroundImage = image;
         renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image");
+        previewHomepageTheme();
       });
     });
     document.querySelectorAll(".transparency-button").forEach((button) => {
       button.addEventListener("click", () => {
         pendingBackgroundTransparency = normalizeTransparency(button.dataset.transparency);
         updateTransparencyButtons();
+        previewHomepageTheme();
       });
+    });
+    homepageNameInput.addEventListener("input", previewHomepageTheme);
+    homepageAccentInput.addEventListener("change", previewHomepageTheme);
+    backgroundColorInput.addEventListener("change", () => {
+      pendingBackgroundColor = normalizeColor(backgroundColorInput.value, DEFAULT_BACKGROUND_COLOR);
+      previewHomepageTheme();
     });
     cancelBackground.addEventListener("click", closeBackgroundDialog);
     backgroundBackdrop.addEventListener("click", (event) => {
@@ -1786,11 +2105,13 @@
       const image = pendingBackgroundImage;
       const homepageName = normalizeHomepageName(homepageNameInput.value);
       const accentColor = normalizeColor(homepageAccentInput.value, DEFAULT_ACCENT_COLOR);
+      const backgroundColor = normalizeColor(backgroundColorInput.value, DEFAULT_BACKGROUND_COLOR);
       const backgroundTransparency = pendingBackgroundTransparency;
       closeBackgroundDialog();
       commitState(() => {
         state.homepageName = homepageName;
         state.accentColor = accentColor;
+        state.backgroundColor = backgroundColor;
         state.backgroundImage = image;
         state.backgroundTransparency = backgroundTransparency;
       });
@@ -1798,6 +2119,13 @@
 
     undoButton.addEventListener("click", undoChange);
     redoButton.addEventListener("click", redoChange);
+    cancelKeyboard.addEventListener("click", closeVirtualKeyboard);
+    applyKeyboard.addEventListener("click", applyVirtualKeyboardValue);
+    keyboardBackdrop.addEventListener("click", (event) => {
+      if (event.target === keyboardBackdrop) {
+        closeVirtualKeyboard();
+      }
+    });
 
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".color-select")) {
@@ -1807,10 +2135,6 @@
 
     document.addEventListener("keydown", (event) => {
       handleRemoteNavigation(event);
-
-      if (event.key === "Escape" && isAnyModalOpen()) {
-        closeOpenModal();
-      }
     });
 
     resetPublished.addEventListener("click", clearLocalOverride);
@@ -1861,7 +2185,20 @@
       return Boolean(document.querySelector(".modal-backdrop.open"));
     }
 
+    function getActiveModal() {
+      if (keyboardBackdrop.classList.contains("open")) return keyboardBackdrop;
+      if (modalBackdrop.classList.contains("open")) return modalBackdrop;
+      if (deleteBackdrop.classList.contains("open")) return deleteBackdrop;
+      if (backgroundBackdrop.classList.contains("open")) return backgroundBackdrop;
+      return null;
+    }
+
     function closeOpenModal() {
+      if (keyboardBackdrop.classList.contains("open")) {
+        closeVirtualKeyboard();
+        return;
+      }
+
       if (modalBackdrop.classList.contains("open")) closeDialogBox();
       if (deleteBackdrop.classList.contains("open")) closeDeleteDialog();
       if (backgroundBackdrop.classList.contains("open")) closeBackgroundDialog();
@@ -1870,6 +2207,23 @@
     function getGridTargets() {
       const selector = settingsMode ? ".move-actions .icon-button, .edit-actions .icon-button, .add-card" : ".app-card";
       return Array.from(appGrid.querySelectorAll(selector));
+    }
+
+    function getModalTargets() {
+      const activeModal = getActiveModal();
+      if (!activeModal) {
+        return [];
+      }
+
+      const targetSelector = [
+        "input:not([type='hidden']):not(.file-input)",
+        ".color-select-button",
+        ".color-select.open .color-option",
+        "button:not(:disabled)"
+      ].join(", ");
+
+      return Array.from(new Set(Array.from(activeModal.querySelectorAll(targetSelector))))
+        .filter((target) => target.offsetParent !== null);
     }
 
     function focusTarget(target) {
@@ -1890,6 +2244,14 @@
     }
 
     function getDefaultRemoteTarget() {
+      const activeModal = getActiveModal();
+      if (activeModal) {
+        if (activeModal === keyboardBackdrop) return keyboardDisplay;
+        if (activeModal === modalBackdrop) return nameInput;
+        if (activeModal === deleteBackdrop) return cancelDelete;
+        if (activeModal === backgroundBackdrop) return homepageNameInput;
+      }
+
       return settingsToggle;
     }
 
@@ -1907,6 +2269,10 @@
     }
 
     function getRemoteTargets() {
+      if (isAnyModalOpen()) {
+        return getModalTargets();
+      }
+
       return [...getTopControlTargets(), ...getGridTargets()]
         .filter((target) => target && !target.disabled && target.offsetParent !== null);
     }
@@ -1916,10 +2282,6 @@
     }
 
     document.addEventListener("pointerover", (event) => {
-      if (isAnyModalOpen()) {
-        return;
-      }
-
       const target = getRemoteTargetFromPointer(event);
       if (target) {
         focusTarget(target);
@@ -1927,10 +2289,6 @@
     });
 
     document.addEventListener("pointerdown", (event) => {
-      if (isAnyModalOpen()) {
-        return;
-      }
-
       if (!getRemoteTargetFromPointer(event)) {
         clearFocus();
       }
@@ -2023,15 +2381,11 @@
     }
 
     function handleRemoteNavigation(event) {
-      if (isAnyModalOpen()) {
-        return;
-      }
-
       const remoteTargets = getRemoteTargets();
       const visibleFocus = document.querySelector(".remote-focus");
       const active = remoteTargets.includes(document.activeElement) ? document.activeElement : visibleFocus;
       const isRemoteTarget = remoteTargets.includes(active);
-      const clearKeys = ["Escape", "Backspace", "BrowserBack", "Back", "GoBack", "Home", "BrowserHome"];
+      const clearKeys = ["Escape", "BrowserBack", "Back", "GoBack", "Home", "BrowserHome"];
       const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", ...clearKeys];
 
       if (!remoteKeys.includes(event.key)) {
@@ -2040,11 +2394,24 @@
 
       if (clearKeys.includes(event.key)) {
         event.preventDefault();
-        clearFocus();
+        if (isAnyModalOpen()) {
+          closeOpenModal();
+        } else {
+          clearFocus();
+        }
+        return;
+      }
+
+      if (event.key === "Enter" && isRemoteTarget && active.matches("input") && active !== keyboardDisplay) {
+        event.preventDefault();
+        openVirtualKeyboard(active);
         return;
       }
 
       if ((event.key === "Enter" || event.key === " ") && isRemoteTarget) {
+        if (active.matches("input")) {
+          return;
+        }
         event.preventDefault();
         active.click();
         return;
@@ -2078,6 +2445,7 @@
     }
 
     initializeColorSelects();
+    buildVirtualKeyboard();
     installIcons();
     render();
     initializeState();

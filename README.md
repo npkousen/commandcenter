@@ -51,7 +51,7 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Edit mode shows column controls for `2`, `3`, and `4` columns.
 - Edit mode shows undo and redo controls for changes made during the current browser session.
 - Edit mode can export the current setup to JSON and import that setup later or on another device.
-- Edit mode includes an Edit Homepage control for the CommandCenter name, accent color, background image, and background transparency.
+- Edit mode includes an Edit Homepage control for the CommandCenter name, accent color, background color, background image, and image dim level.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
 - Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
@@ -63,7 +63,7 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - The grid and cards resize to fit the visible browser viewport without page scrolling.
 - Cards are capped at one-third of the shorter screen dimension so they do not dominate the TV display.
 - App cards support keyboard/remote navigation with arrow keys and Enter.
-- In settings mode, cards are not selectable; remote focus moves through the column controls, reset, add, edit, and delete buttons.
+- In settings mode, cards are not selectable; remote focus moves through the column controls, reset, add, edit, delete, reorder, and modal controls.
 
 ## Updating Shared Apps
 
@@ -78,7 +78,8 @@ GitHub Pages will publish the new app list automatically. Devices with no local 
   "columns": 2,
   "homepageName": "Kousen",
   "accentColor": "#ef4444",
-  "backgroundImage": "",
+  "backgroundColor": "#111827",
+  "backgroundImage": "bliss.png",
   "backgroundTransparency": 50,
   "apps": []
 }
