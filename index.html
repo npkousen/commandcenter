@@ -845,7 +845,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.3</div>
+  <div class="version">Version 0.1.4</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -1646,6 +1646,11 @@
     }
 
     function findDirectionalTarget(currentTarget, direction) {
+      const gridTarget = findGridDirectionalTarget(currentTarget, direction);
+      if (gridTarget) {
+        return gridTarget;
+      }
+
       const current = getTargetCenter(currentTarget);
       const candidates = getRemoteTargets().filter((target) => target !== currentTarget);
       let bestTarget = null;
@@ -1673,13 +1678,59 @@
       return bestTarget;
     }
 
+    function findGridDirectionalTarget(currentTarget, direction) {
+      if (settingsMode || !currentTarget.classList.contains("app-card")) {
+        return null;
+      }
+
+      const targets = getGridTargets();
+      const columns = renderedColumns || state.columns || 2;
+      const currentSlot = Number(currentTarget.dataset.slot);
+
+      if (!Number.isInteger(currentSlot) || columns < 1) {
+        return null;
+      }
+
+      const targetBySlot = new Map(
+        targets.map((target) => [Number(target.dataset.slot), target])
+      );
+
+      if (direction === "left" || direction === "right") {
+        const adjacentSlot = currentSlot + (direction === "left" ? -1 : 1);
+        const sameRow = Math.floor(adjacentSlot / columns) === Math.floor(currentSlot / columns);
+        return sameRow ? targetBySlot.get(adjacentSlot) || null : null;
+      }
+
+      const currentColumn = currentSlot % columns;
+      const currentRow = Math.floor(currentSlot / columns);
+      let bestTarget = null;
+      let bestScore = Infinity;
+
+      targetBySlot.forEach((target, slot) => {
+        const row = Math.floor(slot / columns);
+        const column = slot % columns;
+
+        if (direction === "down" && row <= currentRow) return;
+        if (direction === "up" && row >= currentRow) return;
+
+        const score = Math.abs(row - currentRow) * 100 + Math.abs(column - currentColumn);
+        if (score < bestScore) {
+          bestScore = score;
+          bestTarget = target;
+        }
+      });
+
+      return bestTarget;
+    }
+
     function handleRemoteNavigation(event) {
       if (isAnyModalOpen()) {
         return;
       }
 
-      const active = document.activeElement;
       const remoteTargets = getRemoteTargets();
+      const visibleFocus = document.querySelector(".remote-focus");
+      const active = remoteTargets.includes(document.activeElement) ? document.activeElement : visibleFocus;
       const isRemoteTarget = remoteTargets.includes(active);
       const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", "Backspace", "Escape"];
 
