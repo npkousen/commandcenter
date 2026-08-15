@@ -54,6 +54,7 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
 - Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
+- Existing cards can be reordered left or right while settings mode is on.
 - App cards can use initials or a custom uploaded logo.
 - Published/shared app cards are defined in `apps.json`.
 - Settings changes made in the browser are stored as local overrides for that device.

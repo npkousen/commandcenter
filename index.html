@@ -372,14 +372,23 @@
       line-height: 1.18;
     }
 
+    .move-actions,
     .edit-actions {
       position: absolute;
       top: 8px;
-      right: 8px;
       display: none;
       gap: 6px;
     }
 
+    .move-actions {
+      left: 8px;
+    }
+
+    .edit-actions {
+      right: 8px;
+    }
+
+    .settings-on .move-actions,
     .settings-on .edit-actions {
       display: flex;
     }
@@ -407,6 +416,17 @@
     .icon-button.remote-focus {
       outline: 4px solid #ffffff;
       outline-offset: 3px;
+    }
+
+    .icon-button:disabled {
+      color: rgba(248, 250, 252, 0.34);
+      cursor: default;
+      background: rgba(0, 0, 0, 0.18);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .icon-button:disabled:hover {
+      outline: none;
     }
 
     .delete-button:hover,
@@ -825,7 +845,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.2</div>
+  <div class="version">Version 0.1.3</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -861,6 +881,8 @@
       edit: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>',
       delete: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
       add: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>',
+      moveLeft: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
+      moveRight: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
       undo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>',
       redo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"/></svg>',
       columns2: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>',
@@ -1112,6 +1134,32 @@
       redoButton.disabled = !redoStack.length;
     }
 
+    function getOrderedApps() {
+      return state.apps
+        .slice()
+        .sort((a, b) => a.slot - b.slot);
+    }
+
+    function moveApp(appId, direction) {
+      const orderedApps = getOrderedApps();
+      const currentIndex = orderedApps.findIndex((app) => app.id === appId);
+      const targetIndex = currentIndex + direction;
+
+      if (currentIndex < 0 || targetIndex < 0 || targetIndex >= orderedApps.length) {
+        return;
+      }
+
+      commitState(() => {
+        const reorderedApps = getOrderedApps();
+        const [movedApp] = reorderedApps.splice(currentIndex, 1);
+        reorderedApps.splice(targetIndex, 0, movedApp);
+        state.apps = reorderedApps.map((app, slot) => ({
+          ...app,
+          slot
+        }));
+      });
+    }
+
     function createAppCard(app) {
       const link = document.createElement("a");
       link.className = "app-card";
@@ -1120,6 +1168,43 @@
       link.tabIndex = settingsMode ? -1 : 0;
       link.style.setProperty("--card-color", app.color || "#2563eb");
       link.setAttribute("aria-label", `Open ${app.name}`);
+
+      const orderedApps = getOrderedApps();
+      const orderIndex = orderedApps.findIndex((item) => item.id === app.id);
+      const moveActions = document.createElement("div");
+      moveActions.className = "move-actions";
+
+      const moveLeftButton = document.createElement("button");
+      moveLeftButton.className = "icon-button move-button";
+      moveLeftButton.type = "button";
+      moveLeftButton.dataset.slot = String(app.slot);
+      moveLeftButton.dataset.action = "move-left";
+      moveLeftButton.innerHTML = ICONS.moveLeft;
+      moveLeftButton.disabled = orderIndex <= 0;
+      moveLeftButton.title = moveLeftButton.disabled ? "Already first" : "Move left";
+      moveLeftButton.setAttribute("aria-label", `Move ${app.name} left`);
+      moveLeftButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        moveApp(app.id, -1);
+      });
+
+      const moveRightButton = document.createElement("button");
+      moveRightButton.className = "icon-button move-button";
+      moveRightButton.type = "button";
+      moveRightButton.dataset.slot = String(app.slot);
+      moveRightButton.dataset.action = "move-right";
+      moveRightButton.innerHTML = ICONS.moveRight;
+      moveRightButton.disabled = orderIndex < 0 || orderIndex >= orderedApps.length - 1;
+      moveRightButton.title = moveRightButton.disabled ? "Already last" : "Move right";
+      moveRightButton.setAttribute("aria-label", `Move ${app.name} right`);
+      moveRightButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        moveApp(app.id, 1);
+      });
+
+      moveActions.append(moveLeftButton, moveRightButton);
 
       const actions = document.createElement("div");
       actions.className = "edit-actions";
@@ -1173,7 +1258,7 @@
       name.textContent = app.name;
 
       content.append(icon, name);
-      link.append(actions, content);
+      link.append(moveActions, actions, content);
 
       link.addEventListener("click", (event) => {
         if (settingsMode) {
@@ -1520,7 +1605,7 @@
     }
 
     function getGridTargets() {
-      const selector = settingsMode ? ".edit-actions .icon-button, .add-card" : ".app-card";
+      const selector = settingsMode ? ".move-actions .icon-button, .edit-actions .icon-button, .add-card" : ".app-card";
       return Array.from(appGrid.querySelectorAll(selector));
     }
 
