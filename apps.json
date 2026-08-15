@@ -1,11 +1,14 @@
 {
-  "columns": 3,
+  "columns": 2,
+  "accentColor": "#ef4444",
+  "backgroundImage": "",
   "apps": [
     {
       "id": "kousentv",
       "name": "KousenTV",
       "url": "http://192.168.10.10:8000",
       "color": "#2563eb",
+      "logo": "",
       "slot": 0
     },
     {
@@ -13,6 +16,7 @@
       "name": "Plex",
       "url": "http://192.168.10.10:32400/web",
       "color": "#d97706",
+      "logo": "",
       "slot": 1
     }
   ]

@@ -4,7 +4,7 @@ GitHub Pages is the preferred first deployment target for Kousen CommandCenter.
 
 The app is a static `index.html`, so GitHub Pages can serve it directly from the repository root. No build step is required.
 
-Shared app cards are defined in `apps.json`. Updating that file and pushing to `main` updates the published CommandCenter app list. The `columns` value controls whether the app grid uses 3, 4, or 5 columns; rows are calculated automatically.
+Shared app cards are defined in `apps.json`. Updating that file and pushing to `main` updates the published CommandCenter app list. The `columns` value controls whether the app grid uses 2, 3, or 4 columns; rows are calculated automatically.
 
 ## Cost
 

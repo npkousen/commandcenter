@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111827">
-  <title>Kousen CommandCenter</title>
+  <title>Kousen.CommandCenter</title>
   <style>
     :root {
       color-scheme: dark;
@@ -14,10 +14,12 @@
       --text: #f8fafc;
       --muted: #aeb8c6;
       --line: #314156;
-      --accent: #2f80ed;
+      --brand-accent: #ef4444;
+      --accent: var(--brand-accent);
       --green: #22c55e;
       --green-dark: #12823a;
       --danger: #ef4444;
+      --background-image: none;
       --shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -36,8 +38,12 @@
       min-height: 100%;
       margin: 0;
       background:
+        linear-gradient(rgba(17, 24, 39, 0.76), rgba(17, 24, 39, 0.76)),
+        var(--background-image),
         radial-gradient(circle at top left, rgba(47, 128, 237, 0.20), transparent 36rem),
         linear-gradient(135deg, #111827 0%, #172033 46%, #10151f 100%);
+      background-size: cover, cover, auto, auto;
+      background-position: center, center, center, center;
       color: var(--text);
     }
 
@@ -83,16 +89,42 @@
       margin: 0;
       font-size: clamp(1.2rem, 2.3vw, 1.8rem);
       line-height: 1.1;
-      font-weight: 760;
+      font-weight: 400;
       letter-spacing: 0;
     }
 
-    .brand p {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 0.88rem;
+    .brand-kousen {
+      color: var(--text);
+      font-weight: 800;
     }
 
+    .brand-dot {
+      color: #020617;
+      font-weight: 400;
+    }
+
+    .brand-command {
+      color: var(--brand-accent);
+      font-weight: 400;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .history-actions {
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .settings-on .history-actions {
+      display: flex;
+    }
+
+    .toolbar-button,
     .settings-button {
       width: 46px;
       height: 46px;
@@ -100,29 +132,41 @@
       place-items: center;
       border-radius: 8px;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      background: transparent;
+      border: 0;
+      transition: transform 160ms ease, color 160ms ease;
     }
 
+    .toolbar-button:hover,
+    .toolbar-button:focus-visible,
+    .toolbar-button.remote-focus,
     .settings-button:hover,
     .settings-button:focus-visible,
     .settings-button.remote-focus {
-      background: rgba(255, 255, 255, 0.14);
-      border-color: rgba(255, 255, 255, 0.9);
+      color: #ffffff;
       outline: 4px solid #ffffff;
       outline-offset: 4px;
       transform: translateY(-1px);
     }
 
     .settings-button[aria-pressed="true"] {
-      background: rgba(47, 128, 237, 0.26);
-      border-color: rgba(47, 128, 237, 0.55);
+      color: var(--brand-accent);
     }
 
-    .settings-icon {
-      font-size: 1.35rem;
-      line-height: 1;
+    .toolbar-button:disabled {
+      cursor: default;
+      opacity: 0.35;
+    }
+
+    .toolbar-button:disabled:hover {
+      outline: none;
+      transform: none;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      display: block;
     }
 
     .main {
@@ -172,9 +216,12 @@
       justify-content: flex-end;
     }
 
-    .grid-size {
-      min-width: 54px;
-      height: 34px;
+    .grid-size,
+    .panel-icon-button {
+      min-width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
       border-radius: 6px;
       color: var(--muted);
       background: transparent;
@@ -182,13 +229,17 @@
 
     .grid-size:hover,
     .grid-size:focus-visible,
-    .grid-size.remote-focus {
+    .grid-size.remote-focus,
+    .panel-icon-button:hover,
+    .panel-icon-button:focus-visible,
+    .panel-icon-button.remote-focus {
       color: var(--text);
       outline: 4px solid #ffffff;
       outline-offset: 3px;
     }
 
-    .grid-size.active {
+    .grid-size.active,
+    .panel-icon-button.active {
       color: var(--text);
       background: var(--accent);
     }
@@ -215,7 +266,12 @@
       width: 100%;
       display: grid;
       place-items: center;
+      padding: clamp(8px, 1.4vmin, 20px) 0;
       overflow: hidden;
+    }
+
+    .settings-on .grid-wrap {
+      padding: 0;
     }
 
     .app-grid {
@@ -301,6 +357,13 @@
       text-transform: uppercase;
     }
 
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
     .app-name {
       width: 100%;
       overflow-wrap: anywhere;
@@ -372,13 +435,7 @@
       height: clamp(38px, 7vw, 64px);
       display: grid;
       place-items: center;
-      border-radius: 50%;
-      background: var(--green);
-      color: #052e16;
-      font-size: clamp(1.5rem, 4vw, 2.6rem);
-      font-weight: 800;
-      line-height: 1;
-      box-shadow: 0 14px 34px rgba(18, 130, 58, 0.38);
+      color: var(--green);
     }
 
     .empty-state {
@@ -389,6 +446,17 @@
       border: 1px dashed rgba(255, 255, 255, 0.18);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.035);
+    }
+
+    .version {
+      position: fixed;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      color: rgba(248, 250, 252, 0.56);
+      font-size: 0.75rem;
+      letter-spacing: 0;
+      pointer-events: none;
     }
 
     .modal-backdrop {
@@ -402,7 +470,7 @@
       z-index: 20;
     }
 
-    .modal-open .modal-backdrop {
+    .modal-backdrop.open {
       display: grid;
     }
 
@@ -412,6 +480,10 @@
       background: var(--panel);
       border: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow: var(--shadow);
+    }
+
+    .dialog.wide {
+      width: min(560px, 100%);
     }
 
     .dialog-header {
@@ -466,6 +538,38 @@
       color: #111827;
     }
 
+    .upload-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .image-preview {
+      min-height: 138px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.055);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .upload-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
     .actions {
       display: flex;
       justify-content: flex-end;
@@ -474,11 +578,16 @@
     }
 
     .secondary,
-    .primary {
+    .primary,
+    .danger {
       min-height: 42px;
       border-radius: 6px;
       padding: 0 16px;
       color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .secondary {
@@ -496,6 +605,11 @@
     .primary:focus-visible {
       background: #3ee173;
       outline: none;
+    }
+
+    .danger {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.45);
     }
 
     .hint {
@@ -550,22 +664,27 @@
   <div class="shell" id="appShell">
     <header class="topbar">
       <div class="brand">
-        <h1>Kousen CommandCenter</h1>
-        <p id="modeLabel">Home network launchpad</p>
+        <h1><span class="brand-kousen">Kousen</span><span class="brand-dot">.</span><span class="brand-command">CommandCenter</span></h1>
       </div>
-      <button class="settings-button" id="settingsToggle" type="button" aria-label="Toggle settings" aria-pressed="false" title="Settings">
-        <span class="settings-icon" aria-hidden="true">&#9881;</span>
-      </button>
+      <div class="top-actions">
+        <div class="history-actions" aria-label="History controls">
+          <button class="toolbar-button" id="undoButton" type="button" aria-label="Undo" title="Undo"></button>
+          <button class="toolbar-button" id="redoButton" type="button" aria-label="Redo" title="Redo"></button>
+        </div>
+        <button class="settings-button" id="settingsToggle" type="button" aria-label="Toggle settings" aria-pressed="false" title="Settings"></button>
+      </div>
     </header>
 
     <main class="main">
       <section class="controls" aria-label="Layout controls">
         <p class="mode-copy" id="settingsCopy">Settings mode is on. Changes on this device override the published app list.</p>
         <div class="settings-actions">
+          <button class="panel-icon-button" id="backgroundButton" type="button" aria-label="Set background image" title="Background image"></button>
+          <button class="panel-icon-button" id="accentButton" type="button" aria-label="Set accent color" title="Accent color"></button>
           <div class="grid-size-group" role="group" aria-label="Grid size">
-            <button class="grid-size" type="button" data-columns="3">3 Col</button>
-            <button class="grid-size" type="button" data-columns="4">4 Col</button>
-            <button class="grid-size" type="button" data-columns="5">5 Col</button>
+            <button class="grid-size" type="button" data-columns="2" aria-label="2 columns" title="2 columns"></button>
+            <button class="grid-size" type="button" data-columns="3" aria-label="3 columns" title="3 columns"></button>
+            <button class="grid-size" type="button" data-columns="4" aria-label="4 columns" title="4 columns"></button>
           </div>
           <button class="reset-button" id="resetPublished" type="button">Reset to Published</button>
         </div>
@@ -581,7 +700,6 @@
     <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
       <div class="dialog-header">
         <h2 class="dialog-title" id="dialogTitle">Add App</h2>
-        <button class="icon-button" id="closeDialog" type="button" aria-label="Close dialog" title="Close">x</button>
       </div>
       <form class="form" id="appForm">
         <input type="hidden" id="slotInput">
@@ -596,6 +714,18 @@
           <label for="urlInput">URL</label>
           <input id="urlInput" name="url" inputmode="url" required placeholder="http://192.168.10.10:8000">
           <p class="hint">Include the port when the app is not using standard HTTP or HTTPS.</p>
+        </div>
+
+        <div class="field">
+          <label>App logo</label>
+          <div class="upload-panel">
+            <div class="image-preview" id="logoPreview">No logo selected</div>
+            <input class="file-input" id="logoFileInput" type="file" accept="image/*">
+            <div class="upload-actions">
+              <button class="secondary" id="logoUploadButton" type="button"></button>
+              <button class="secondary" id="logoClearButton" type="button"></button>
+            </div>
+          </div>
         </div>
 
         <div class="field">
@@ -619,19 +749,80 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="deleteBackdrop" role="presentation">
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="deleteTitle">Delete App</h2>
+      </div>
+      <div class="form">
+        <p class="hint" id="deleteMessage">Delete this app from CommandCenter?</p>
+        <div class="actions">
+          <button class="secondary" id="cancelDelete" type="button">Cancel</button>
+          <button class="danger" id="confirmDelete" type="button">Delete</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="accentBackdrop" role="presentation">
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="accentTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="accentTitle">Accent Color</h2>
+      </div>
+      <div class="form">
+        <div class="field">
+          <label for="accentColorInput">Accent color</label>
+          <input id="accentColorInput" type="color" value="#ef4444">
+        </div>
+        <div class="actions">
+          <button class="secondary" id="cancelAccent" type="button">Cancel</button>
+          <button class="primary" id="saveAccent" type="button">Save Color</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="backgroundBackdrop" role="presentation">
+    <section class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="backgroundTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="backgroundTitle">Background Image</h2>
+      </div>
+      <div class="form">
+        <div class="upload-panel">
+          <div class="image-preview" id="backgroundPreview">No background image selected</div>
+          <input class="file-input" id="backgroundFileInput" type="file" accept="image/*">
+          <div class="upload-actions">
+            <button class="secondary" id="backgroundUploadButton" type="button"></button>
+            <button class="secondary" id="backgroundClearButton" type="button"></button>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="secondary" id="cancelBackground" type="button">Cancel</button>
+          <button class="primary" id="saveBackground" type="button">Save Background</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="version">Version 0.1.1</div>
+
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
     const LEGACY_STORAGE_KEY = "kousen-commandcenter:v1";
     const CONFIG_URL = "apps.json";
-    const COLUMN_OPTIONS = [3, 4, 5];
+    const COLUMN_OPTIONS = [2, 3, 4];
+    const DEFAULT_ACCENT_COLOR = "#ef4444";
     const FALLBACK_STATE = {
-      columns: 3,
+      columns: 2,
+      accentColor: DEFAULT_ACCENT_COLOR,
+      backgroundImage: "",
       apps: [
         {
           id: "kousentv",
           name: "KousenTV",
           url: "http://192.168.10.10:8000",
           color: "#2563eb",
+          logo: "",
           slot: 0
         },
         {
@@ -639,34 +830,76 @@
           name: "Plex",
           url: "http://192.168.10.10:32400/web",
           color: "#d97706",
+          logo: "",
           slot: 1
         }
       ]
+    };
+    const ICONS = {
+      settings: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>',
+      edit: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>',
+      delete: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
+      add: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>',
+      undo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>',
+      redo: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"/></svg>',
+      columns2: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>',
+      columns3: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>',
+      columns4: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7.5 3v18"/><path d="M12 3v18"/><path d="M16.5 3v18"/></svg>',
+      palette: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
+      wallpaper: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v4"/><path d="M8 21h8"/><path d="m9 17 6.1-6.1a2 2 0 0 1 2.81.01L22 15"/><circle cx="8" cy="9" r="2"/><rect x="2" y="3" width="20" height="14" rx="2"/></svg>',
+      imageUp: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"/><path d="m14 19.5 3-3 3 3"/><path d="M17 22v-5.5"/><circle cx="9" cy="9" r="2"/></svg>',
+      trash: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'
     };
 
     const shell = document.getElementById("appShell");
     const main = document.querySelector(".main");
     const appGrid = document.getElementById("appGrid");
     const settingsToggle = document.getElementById("settingsToggle");
-    const modeLabel = document.getElementById("modeLabel");
+    const undoButton = document.getElementById("undoButton");
+    const redoButton = document.getElementById("redoButton");
+    const backgroundButton = document.getElementById("backgroundButton");
+    const accentButton = document.getElementById("accentButton");
     const modalBackdrop = document.getElementById("modalBackdrop");
     const appForm = document.getElementById("appForm");
     const dialogTitle = document.getElementById("dialogTitle");
-    const closeDialog = document.getElementById("closeDialog");
     const cancelDialog = document.getElementById("cancelDialog");
     const slotInput = document.getElementById("slotInput");
     const editingId = document.getElementById("editingId");
     const nameInput = document.getElementById("nameInput");
     const urlInput = document.getElementById("urlInput");
     const colorInput = document.getElementById("colorInput");
+    const logoPreview = document.getElementById("logoPreview");
+    const logoFileInput = document.getElementById("logoFileInput");
+    const logoUploadButton = document.getElementById("logoUploadButton");
+    const logoClearButton = document.getElementById("logoClearButton");
     const resetPublished = document.getElementById("resetPublished");
+    const deleteBackdrop = document.getElementById("deleteBackdrop");
+    const cancelDelete = document.getElementById("cancelDelete");
+    const confirmDelete = document.getElementById("confirmDelete");
+    const deleteMessage = document.getElementById("deleteMessage");
+    const accentBackdrop = document.getElementById("accentBackdrop");
+    const accentColorInput = document.getElementById("accentColorInput");
+    const cancelAccent = document.getElementById("cancelAccent");
+    const saveAccent = document.getElementById("saveAccent");
+    const backgroundBackdrop = document.getElementById("backgroundBackdrop");
+    const backgroundPreview = document.getElementById("backgroundPreview");
+    const backgroundFileInput = document.getElementById("backgroundFileInput");
+    const backgroundUploadButton = document.getElementById("backgroundUploadButton");
+    const backgroundClearButton = document.getElementById("backgroundClearButton");
+    const cancelBackground = document.getElementById("cancelBackground");
+    const saveBackground = document.getElementById("saveBackground");
 
     let publishedState = cloneState(FALLBACK_STATE);
     let state = cloneState(FALLBACK_STATE);
     let settingsMode = false;
     let hasLocalOverride = false;
     let gridMetricFrame = 0;
-    let renderedColumns = 3;
+    let renderedColumns = 2;
+    let undoStack = [];
+    let redoStack = [];
+    let currentLogo = "";
+    let pendingBackgroundImage = "";
+    let pendingDeleteId = "";
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
@@ -699,14 +932,22 @@
           name: name.slice(0, 36),
           url: normalizeUrl(url),
           color: String(app.color || "#2563eb"),
+          logo: String(app.logo || ""),
           slot: app.slot
         });
       });
 
       return {
         columns,
+        accentColor: normalizeColor(candidate.accentColor, DEFAULT_ACCENT_COLOR),
+        backgroundImage: String(candidate.backgroundImage || ""),
         apps
       };
+    }
+
+    function normalizeColor(value, fallback) {
+      const color = String(value || "").trim();
+      return /^#[0-9a-f]{6}$/i.test(color) ? color : fallback;
     }
 
     function readLocalOverride() {
@@ -722,12 +963,45 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       localStorage.removeItem(LEGACY_STORAGE_KEY);
       hasLocalOverride = true;
+      updateHistoryButtons();
+    }
+
+    function commitState(mutator) {
+      undoStack.push(cloneState(state));
+      redoStack = [];
+      mutator();
+      saveState();
+      render();
+    }
+
+    function undoChange() {
+      if (!undoStack.length) {
+        return;
+      }
+
+      redoStack.push(cloneState(state));
+      state = undoStack.pop();
+      saveState();
+      render();
+    }
+
+    function redoChange() {
+      if (!redoStack.length) {
+        return;
+      }
+
+      undoStack.push(cloneState(state));
+      state = redoStack.pop();
+      saveState();
+      render();
     }
 
     function clearLocalOverride() {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(LEGACY_STORAGE_KEY);
       hasLocalOverride = false;
+      undoStack = [];
+      redoStack = [];
       state = cloneState(publishedState);
       render();
     }
@@ -752,6 +1026,7 @@
     }
 
     function render() {
+      applyTheme();
       const columns = state.columns;
       const visibleApps = state.apps
         .slice()
@@ -776,6 +1051,7 @@
 
       resetPublished.disabled = !hasLocalOverride;
       resetPublished.title = hasLocalOverride ? "Discard this device's local changes" : "Already using the published app list";
+      updateHistoryButtons();
 
       if (!settingsMode && visibleApps.length === 0) {
         const empty = document.createElement("div");
@@ -804,6 +1080,17 @@
       restoreUsefulFocus();
     }
 
+    function applyTheme() {
+      const accentColor = normalizeColor(state.accentColor, DEFAULT_ACCENT_COLOR);
+      document.documentElement.style.setProperty("--brand-accent", accentColor);
+      document.documentElement.style.setProperty("--background-image", state.backgroundImage ? `url(${JSON.stringify(state.backgroundImage)})` : "none");
+    }
+
+    function updateHistoryButtons() {
+      undoButton.disabled = !undoStack.length;
+      redoButton.disabled = !redoStack.length;
+    }
+
     function createAppCard(app) {
       const link = document.createElement("a");
       link.className = "app-card";
@@ -821,7 +1108,7 @@
       editButton.type = "button";
       editButton.dataset.slot = String(app.slot);
       editButton.dataset.action = "edit";
-      editButton.innerHTML = "&#9998;";
+      editButton.innerHTML = ICONS.edit;
       editButton.title = "Edit";
       editButton.setAttribute("aria-label", `Edit ${app.name}`);
       editButton.addEventListener("click", (event) => {
@@ -835,15 +1122,13 @@
       deleteButton.type = "button";
       deleteButton.dataset.slot = String(app.slot);
       deleteButton.dataset.action = "delete";
-      deleteButton.innerHTML = "&#128465;";
+      deleteButton.innerHTML = ICONS.delete;
       deleteButton.title = "Delete";
       deleteButton.setAttribute("aria-label", `Delete ${app.name}`);
       deleteButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        state.apps = state.apps.filter((item) => item.id !== app.id);
-        saveState();
-        render();
+        openDeleteDialog(app);
       });
 
       actions.append(editButton, deleteButton);
@@ -853,7 +1138,14 @@
 
       const icon = document.createElement("span");
       icon.className = "app-icon";
-      icon.textContent = getInitials(app.name);
+      if (app.logo) {
+        const logo = document.createElement("img");
+        logo.src = app.logo;
+        logo.alt = "";
+        icon.appendChild(logo);
+      } else {
+        icon.textContent = getInitials(app.name);
+      }
 
       const name = document.createElement("span");
       name.className = "app-name";
@@ -865,7 +1157,6 @@
       link.addEventListener("click", (event) => {
         if (settingsMode) {
           event.preventDefault();
-          openDialog(app.slot, app);
         }
       });
 
@@ -878,7 +1169,7 @@
       button.type = "button";
       button.dataset.slot = String(slot);
       button.setAttribute("aria-label", `Add app to slot ${slot + 1}`);
-      button.innerHTML = '<span class="plus-mark" aria-hidden="true">+</span>';
+      button.innerHTML = `<span class="plus-mark" aria-hidden="true">${ICONS.add}</span>`;
       button.addEventListener("click", () => openDialog(slot));
       return button;
     }
@@ -890,15 +1181,77 @@
       nameInput.value = app ? app.name : "";
       urlInput.value = app ? app.url : "";
       colorInput.value = app ? app.color : "#2563eb";
-      document.body.classList.add("modal-open");
+      currentLogo = app ? app.logo || "" : "";
+      renderImagePreview(logoPreview, currentLogo, "No logo selected");
+      modalBackdrop.classList.add("open");
       nameInput.focus();
     }
 
     function closeDialogBox() {
-      document.body.classList.remove("modal-open");
+      modalBackdrop.classList.remove("open");
       appForm.reset();
       editingId.value = "";
       slotInput.value = "";
+      currentLogo = "";
+      renderImagePreview(logoPreview, "", "No logo selected");
+    }
+
+    function openDeleteDialog(app) {
+      pendingDeleteId = app.id;
+      deleteMessage.textContent = `Delete ${app.name} from CommandCenter?`;
+      deleteBackdrop.classList.add("open");
+      cancelDelete.focus();
+    }
+
+    function closeDeleteDialog() {
+      pendingDeleteId = "";
+      deleteBackdrop.classList.remove("open");
+    }
+
+    function openAccentDialog() {
+      accentColorInput.value = normalizeColor(state.accentColor, DEFAULT_ACCENT_COLOR);
+      accentBackdrop.classList.add("open");
+      accentColorInput.focus();
+    }
+
+    function closeAccentDialog() {
+      accentBackdrop.classList.remove("open");
+    }
+
+    function openBackgroundDialog() {
+      pendingBackgroundImage = state.backgroundImage || "";
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+      backgroundBackdrop.classList.add("open");
+      backgroundUploadButton.focus();
+    }
+
+    function closeBackgroundDialog() {
+      pendingBackgroundImage = "";
+      backgroundFileInput.value = "";
+      backgroundBackdrop.classList.remove("open");
+    }
+
+    function renderImagePreview(preview, image, emptyText) {
+      preview.innerHTML = "";
+      if (!image) {
+        preview.textContent = emptyText;
+        return;
+      }
+
+      const img = document.createElement("img");
+      img.src = image;
+      img.alt = "";
+      preview.appendChild(img);
+    }
+
+    function readImageFile(file, onLoad) {
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.addEventListener("load", () => onLoad(String(reader.result || "")));
+      reader.readAsDataURL(file);
     }
 
     function normalizeUrl(rawUrl) {
@@ -925,27 +1278,61 @@
       return `app-${Date.now()}-${Math.round(Math.random() * 100000)}`;
     }
 
+    function setIcon(button, icon, label = "") {
+      button.innerHTML = `${icon}${label ? `<span>${label}</span>` : ""}`;
+    }
+
+    function installIcons() {
+      setIcon(settingsToggle, ICONS.settings);
+      setIcon(undoButton, ICONS.undo);
+      setIcon(redoButton, ICONS.redo);
+      setIcon(backgroundButton, ICONS.wallpaper);
+      setIcon(accentButton, ICONS.palette);
+      setIcon(logoUploadButton, ICONS.imageUp, "Upload Image");
+      setIcon(logoClearButton, ICONS.trash, "Clear Image");
+      setIcon(backgroundUploadButton, ICONS.imageUp, "Upload Image");
+      setIcon(backgroundClearButton, ICONS.trash, "Clear Image");
+      document.querySelectorAll(".grid-size").forEach((button) => {
+        setIcon(button, ICONS[`columns${button.dataset.columns}`]);
+      });
+    }
+
     function getColumnButtons() {
       return Array.from(document.querySelectorAll(".grid-size"));
     }
 
     function getTopControlTargets() {
-      return settingsMode ? [settingsToggle, ...getColumnButtons(), resetPublished] : [settingsToggle];
+      if (!settingsMode) {
+        return [settingsToggle];
+      }
+
+      return [
+        backgroundButton,
+        accentButton,
+        ...getColumnButtons(),
+        resetPublished,
+        undoButton,
+        redoButton,
+        settingsToggle
+      ];
     }
 
     settingsToggle.addEventListener("click", () => {
       settingsMode = !settingsMode;
       shell.classList.toggle("settings-on", settingsMode);
       settingsToggle.setAttribute("aria-pressed", String(settingsMode));
-      modeLabel.textContent = settingsMode ? "Settings mode" : "Home network launchpad";
       render();
     });
 
     document.querySelectorAll(".grid-size").forEach((button) => {
       button.addEventListener("click", () => {
-        state.columns = Number(button.dataset.columns);
-        saveState();
-        render();
+        const columns = Number(button.dataset.columns);
+        if (state.columns === columns) {
+          return;
+        }
+        commitState(() => {
+          state.columns = columns;
+        });
       });
     });
 
@@ -958,17 +1345,17 @@
         name: nameInput.value.trim(),
         url: normalizeUrl(urlInput.value),
         color: colorInput.value,
+        logo: currentLogo,
         slot
       };
 
-      state.apps = state.apps.filter((item) => item.id !== id && item.slot !== slot);
-      state.apps.push(app);
-      saveState();
+      commitState(() => {
+        state.apps = state.apps.filter((item) => item.id !== id && item.slot !== slot);
+        state.apps.push(app);
+      });
       closeDialogBox();
-      render();
     });
 
-    closeDialog.addEventListener("click", closeDialogBox);
     cancelDialog.addEventListener("click", closeDialogBox);
     modalBackdrop.addEventListener("click", (event) => {
       if (event.target === modalBackdrop) {
@@ -976,11 +1363,83 @@
       }
     });
 
+    logoUploadButton.addEventListener("click", () => logoFileInput.click());
+    logoClearButton.addEventListener("click", () => {
+      currentLogo = "";
+      logoFileInput.value = "";
+      renderImagePreview(logoPreview, currentLogo, "No logo selected");
+    });
+    logoFileInput.addEventListener("change", () => {
+      readImageFile(logoFileInput.files[0], (image) => {
+        currentLogo = image;
+        renderImagePreview(logoPreview, currentLogo, "No logo selected");
+      });
+    });
+
+    cancelDelete.addEventListener("click", closeDeleteDialog);
+    deleteBackdrop.addEventListener("click", (event) => {
+      if (event.target === deleteBackdrop) {
+        closeDeleteDialog();
+      }
+    });
+    confirmDelete.addEventListener("click", () => {
+      const id = pendingDeleteId;
+      closeDeleteDialog();
+      commitState(() => {
+        state.apps = state.apps.filter((item) => item.id !== id);
+      });
+    });
+
+    accentButton.addEventListener("click", openAccentDialog);
+    cancelAccent.addEventListener("click", closeAccentDialog);
+    accentBackdrop.addEventListener("click", (event) => {
+      if (event.target === accentBackdrop) {
+        closeAccentDialog();
+      }
+    });
+    saveAccent.addEventListener("click", () => {
+      const color = normalizeColor(accentColorInput.value, DEFAULT_ACCENT_COLOR);
+      closeAccentDialog();
+      commitState(() => {
+        state.accentColor = color;
+      });
+    });
+
+    backgroundButton.addEventListener("click", openBackgroundDialog);
+    backgroundUploadButton.addEventListener("click", () => backgroundFileInput.click());
+    backgroundClearButton.addEventListener("click", () => {
+      pendingBackgroundImage = "";
+      backgroundFileInput.value = "";
+      renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+    });
+    backgroundFileInput.addEventListener("change", () => {
+      readImageFile(backgroundFileInput.files[0], (image) => {
+        pendingBackgroundImage = image;
+        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No background image selected");
+      });
+    });
+    cancelBackground.addEventListener("click", closeBackgroundDialog);
+    backgroundBackdrop.addEventListener("click", (event) => {
+      if (event.target === backgroundBackdrop) {
+        closeBackgroundDialog();
+      }
+    });
+    saveBackground.addEventListener("click", () => {
+      const image = pendingBackgroundImage;
+      closeBackgroundDialog();
+      commitState(() => {
+        state.backgroundImage = image;
+      });
+    });
+
+    undoButton.addEventListener("click", undoChange);
+    redoButton.addEventListener("click", redoChange);
+
     document.addEventListener("keydown", (event) => {
       handleRemoteNavigation(event);
 
-      if (event.key === "Escape" && document.body.classList.contains("modal-open")) {
-        closeDialogBox();
+      if (event.key === "Escape" && isAnyModalOpen()) {
+        closeOpenModal();
       }
     });
 
@@ -1007,7 +1466,7 @@
     }
 
     function updateGridMetrics() {
-      const columns = renderedColumns || state.columns || 3;
+      const columns = renderedColumns || state.columns || 2;
       const rows = Number(appGrid.style.getPropertyValue("--rows")) || 1;
       const gap = getGridGap();
       const topbarHeight = document.querySelector(".topbar").getBoundingClientRect().height;
@@ -1028,6 +1487,17 @@
       appGrid.style.gridAutoRows = `${normalizedSize}px`;
     }
 
+    function isAnyModalOpen() {
+      return Boolean(document.querySelector(".modal-backdrop.open"));
+    }
+
+    function closeOpenModal() {
+      if (modalBackdrop.classList.contains("open")) closeDialogBox();
+      if (deleteBackdrop.classList.contains("open")) closeDeleteDialog();
+      if (accentBackdrop.classList.contains("open")) closeAccentDialog();
+      if (backgroundBackdrop.classList.contains("open")) closeBackgroundDialog();
+    }
+
     function getGridTargets() {
       const selector = settingsMode ? ".edit-actions .icon-button, .add-card" : ".app-card";
       return Array.from(appGrid.querySelectorAll(selector));
@@ -1044,7 +1514,7 @@
     }
 
     function restoreUsefulFocus() {
-      if (document.body.classList.contains("modal-open")) {
+      if (isAnyModalOpen()) {
         return;
       }
 
@@ -1098,7 +1568,7 @@
     }
 
     function handleRemoteNavigation(event) {
-      if (document.body.classList.contains("modal-open")) {
+      if (isAnyModalOpen()) {
         return;
       }
 
@@ -1151,6 +1621,7 @@
       }
     }
 
+    installIcons();
     render();
     initializeState();
   </script>

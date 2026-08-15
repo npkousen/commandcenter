@@ -24,3 +24,6 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - Maintain TV/tablet usability: large targets, stable grid cells, strong focus states, and short labels.
 - Preserve kiosk behavior: no document scrolling in fullscreen, card size capped to one-third of the shorter viewport side, arrow-key/remote navigation, and Enter-to-open app cards.
 - In settings mode, do not make app cards remote-focusable; expose add/edit/delete and layout controls instead.
+- Supported layout widths are 2, 3, and 4 columns. Rows are automatic.
+- The visible footer version should increment by `0.0.1` for routine updates and by `0.1.0` for larger releases.
+- Accent color, background image, and app logos are stored in the same shared/local state model as app cards. Uploaded images are stored as browser data URLs, so keep them small enough for localStorage.

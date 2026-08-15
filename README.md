@@ -46,12 +46,15 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 
 ## Current Behavior
 
-- The top-left title is `Kousen CommandCenter`.
+- The top-left title is `Kousen.CommandCenter`.
 - The top-right settings button toggles edit mode.
-- Edit mode shows column controls for `3`, `4`, and `5` columns.
+- Edit mode shows column controls for `2`, `3`, and `4` columns.
+- Edit mode shows undo and redo controls for changes made during the current browser session.
+- Edit mode includes controls for the CommandCenter accent color and background image.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
-- Existing cards can be edited or deleted while settings mode is on.
+- Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
+- App cards can use initials or a custom uploaded logo.
 - Published/shared app cards are defined in `apps.json`.
 - Settings changes made in the browser are stored as local overrides for that device.
 - The settings panel can reset a device back to the published `apps.json` list.
@@ -66,16 +69,20 @@ Edit `apps.json`, commit the change, and push to `main`.
 
 GitHub Pages will publish the new app list automatically. Devices with no local overrides will pick up the published list on their next page load.
 
-`apps.json` uses `columns` to choose the layout width:
+`apps.json` uses `columns` to choose the layout width and can define the shared accent/background defaults:
 
 ```json
 {
-  "columns": 3,
+  "columns": 2,
+  "accentColor": "#ef4444",
+  "backgroundImage": "",
   "apps": []
 }
 ```
 
-Supported column counts are `3`, `4`, and `5`. Rows are calculated automatically from the configured apps.
+Supported column counts are `2`, `3`, and `4`. Rows are calculated automatically from the configured apps.
+
+CommandCenter displays a small version label at the bottom of the page. Increment the patch version by `0.0.1` for normal updates and the minor version by `0.1.0` for larger releases.
 
 ## Optional LAN Deployment Strategy
 
