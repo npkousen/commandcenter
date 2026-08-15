@@ -1243,7 +1243,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.10</div>
+  <div class="version">Version 0.1.11</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -1380,6 +1380,7 @@
     let keyboardTargetInput = null;
     let weatherCache = {};
     let weatherRefreshTimers = {};
+    let preferredFocusKey = "";
 
     function cloneState(value) {
       return JSON.parse(JSON.stringify(value));
@@ -1534,17 +1535,28 @@
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-      hasLocalOverride = true;
-      updateHistoryButtons();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+        hasLocalOverride = true;
+        updateHistoryButtons();
+        return true;
+      } catch {
+        window.alert("CommandCenter could not save that setup locally. Try a smaller uploaded image, or use the built-in bliss.png background.");
+        return false;
+      }
     }
 
     function commitState(mutator) {
-      undoStack.push(cloneState(state));
+      const previousState = cloneState(state);
       redoStack = [];
       mutator();
-      saveState();
+      if (!saveState()) {
+        state = previousState;
+        render();
+        return;
+      }
+      undoStack.push(previousState);
       render();
     }
 
@@ -1553,9 +1565,15 @@
         return;
       }
 
-      redoStack.push(cloneState(state));
-      state = undoStack.pop();
-      saveState();
+      const currentState = cloneState(state);
+      const previousState = undoStack.pop();
+      state = previousState;
+      if (!saveState()) {
+        state = currentState;
+        undoStack.push(previousState);
+        return;
+      }
+      redoStack.push(currentState);
       render();
     }
 
@@ -1564,16 +1582,22 @@
         return;
       }
 
-      undoStack.push(cloneState(state));
-      state = redoStack.pop();
-      saveState();
+      const currentState = cloneState(state);
+      const nextState = redoStack.pop();
+      state = nextState;
+      if (!saveState()) {
+        state = currentState;
+        redoStack.push(nextState);
+        return;
+      }
+      undoStack.push(currentState);
       render();
     }
 
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.1.10",
+        version: "0.1.11",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -1793,6 +1817,7 @@
       moveLeftButton.className = "icon-button move-button";
       moveLeftButton.type = "button";
       moveLeftButton.dataset.slot = String(app.slot);
+      moveLeftButton.dataset.appId = app.id;
       moveLeftButton.dataset.action = "move-left";
       moveLeftButton.innerHTML = ICONS.moveLeft;
       moveLeftButton.disabled = orderIndex <= 0;
@@ -1808,6 +1833,7 @@
       moveRightButton.className = "icon-button move-button";
       moveRightButton.type = "button";
       moveRightButton.dataset.slot = String(app.slot);
+      moveRightButton.dataset.appId = app.id;
       moveRightButton.dataset.action = "move-right";
       moveRightButton.innerHTML = ICONS.moveRight;
       moveRightButton.disabled = orderIndex < 0 || orderIndex >= orderedApps.length - 1;
@@ -1828,6 +1854,7 @@
       editButton.className = "icon-button";
       editButton.type = "button";
       editButton.dataset.slot = String(app.slot);
+      editButton.dataset.appId = app.id;
       editButton.dataset.action = "edit";
       editButton.innerHTML = ICONS.edit;
       editButton.title = "Edit";
@@ -1842,6 +1869,7 @@
       deleteButton.className = "icon-button delete-button";
       deleteButton.type = "button";
       deleteButton.dataset.slot = String(app.slot);
+      deleteButton.dataset.appId = app.id;
       deleteButton.dataset.action = "delete";
       deleteButton.innerHTML = ICONS.delete;
       deleteButton.title = "Delete";
@@ -1981,10 +2009,10 @@
       currentAppType = currentAppType === type ? "link" : normalizeAppType(type);
       appTypeInput.value = currentAppType;
       if (currentAppType === "weather" && previousType !== "weather") {
-        nameInput.value = "10001";
+        nameInput.value = "20500";
       }
       if (currentAppType === "clock" && previousType !== "clock") {
-        nameInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+        nameInput.value = "America/New_York";
       }
       updateAppModeFields();
       focusTarget(nameInput);
@@ -1997,7 +2025,7 @@
       clockModeButton.classList.toggle("active", type === "clock");
       clockModeButton.setAttribute("aria-pressed", String(type === "clock"));
       nameInputLabel.textContent = type === "weather" ? "Zip Code" : type === "clock" ? "Timezone" : "App Name";
-      nameInput.placeholder = type === "weather" ? "10001" : type === "clock" ? "America/New_York" : "KousenTV";
+      nameInput.placeholder = type === "weather" ? "20500" : type === "clock" ? "America/New_York" : "KousenTV";
       urlField.classList.toggle("hidden", type !== "link");
       urlInput.required = type === "link";
       logoField.classList.toggle("hidden", type !== "link");
@@ -2567,7 +2595,15 @@
       previewHomepageTheme();
     });
     backgroundFileInput.addEventListener("change", () => {
-      readImageFile(backgroundFileInput.files[0], (image) => {
+      const file = backgroundFileInput.files[0];
+      if (file?.name?.toLowerCase() === DEFAULT_BACKGROUND_IMAGE) {
+        pendingBackgroundImage = DEFAULT_BACKGROUND_IMAGE;
+        renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
+        previewHomepageTheme();
+        return;
+      }
+
+      readImageFile(file, (image) => {
         pendingBackgroundImage = image;
         renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
         previewHomepageTheme();
@@ -2730,6 +2766,59 @@
       document.querySelectorAll(".remote-focus").forEach((item) => item.classList.remove("remote-focus"));
       target.focus({ preventScroll: true });
       target.classList.add("remote-focus");
+      preferredFocusKey = getFocusKey(target);
+    }
+
+    function getFocusKey(target) {
+      if (!target) {
+        return "";
+      }
+
+      if (target.dataset?.action && target.dataset?.appId) {
+        return `app-action:${target.dataset.appId}:${target.dataset.action}`;
+      }
+
+      if (target.classList?.contains("app-card") && target.dataset?.appId) {
+        return `app-card:${target.dataset.appId}`;
+      }
+
+      if (target.classList?.contains("add-card") && target.dataset?.slot) {
+        return `add:${target.dataset.slot}`;
+      }
+
+      if (target.id) {
+        return `id:${target.id}`;
+      }
+
+      if (target.dataset?.columns) {
+        return `columns:${target.dataset.columns}`;
+      }
+
+      return "";
+    }
+
+    function findTargetByFocusKey(focusKey) {
+      if (!focusKey) {
+        return null;
+      }
+
+      const targets = getRemoteTargets();
+      const exactTarget = targets.find((target) => getFocusKey(target) === focusKey);
+      if (exactTarget) {
+        return exactTarget;
+      }
+
+      const parts = focusKey.split(":");
+      if (parts[0] === "app-action") {
+        const [, appId, action] = parts;
+        const sameAppTargets = targets.filter((target) => target.dataset?.appId === appId);
+        return sameAppTargets.find((target) => target.dataset?.action === action) ||
+          sameAppTargets.find((target) => target.dataset?.action?.startsWith("move-")) ||
+          sameAppTargets[0] ||
+          null;
+      }
+
+      return null;
     }
 
     function clearFocus() {
@@ -2737,6 +2826,7 @@
       if (document.activeElement && document.activeElement !== document.body) {
         document.activeElement.blur();
       }
+      preferredFocusKey = "";
     }
 
     function getDefaultRemoteTarget() {
@@ -2761,7 +2851,8 @@
         return;
       }
 
-      focusTarget(getDefaultRemoteTarget());
+      const rememberedTarget = findTargetByFocusKey(preferredFocusKey);
+      focusTarget(rememberedTarget || getDefaultRemoteTarget());
     }
 
     function getRemoteTargets() {
