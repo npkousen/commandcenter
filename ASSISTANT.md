@@ -26,5 +26,5 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - In settings mode, do not make app cards remote-focusable; expose add/edit/delete/reorder and layout controls instead.
 - Supported layout widths are 2, 3, and 4 columns. Rows are automatic.
 - The visible footer version should increment by `0.0.1` for routine updates and by `0.1.0` for larger releases.
-- Accent color, background image, and app logos are stored in the same shared/local state model as app cards. Uploaded images are stored as browser data URLs, so keep them small enough for localStorage.
+- Homepage name, accent color, background image, background transparency, and app logos are stored in the same shared/local state model as app cards. Uploaded images are stored as browser data URLs, so keep them small enough for localStorage.
 - Settings mode supports exporting/importing the current local setup as JSON; imported files must pass the same `validateState` path used for `apps.json`.

@@ -51,7 +51,7 @@ See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
 - Edit mode shows column controls for `2`, `3`, and `4` columns.
 - Edit mode shows undo and redo controls for changes made during the current browser session.
 - Edit mode can export the current setup to JSON and import that setup later or on another device.
-- Edit mode includes controls for the CommandCenter accent color and background image.
+- Edit mode includes an Edit Homepage control for the CommandCenter name, accent color, background image, and background transparency.
 - Edit mode shows green add buttons in empty grid slots.
 - App cards open their configured URL in the same browser tab.
 - Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
@@ -71,13 +71,15 @@ Edit `apps.json`, commit the change, and push to `main`.
 
 GitHub Pages will publish the new app list automatically. Devices with no local overrides will pick up the published list on their next page load.
 
-`apps.json` uses `columns` to choose the layout width and can define the shared accent/background defaults:
+`apps.json` uses `columns` to choose the layout width and can define the shared homepage defaults:
 
 ```json
 {
   "columns": 2,
+  "homepageName": "Kousen",
   "accentColor": "#ef4444",
   "backgroundImage": "",
+  "backgroundTransparency": 50,
   "apps": []
 }
 ```
