@@ -838,7 +838,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.5</div>
+  <div class="version">Version 0.1.6</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -1612,6 +1612,17 @@
       target.classList.add("remote-focus");
     }
 
+    function clearFocus() {
+      document.querySelectorAll(".remote-focus").forEach((item) => item.classList.remove("remote-focus"));
+      if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.blur();
+      }
+    }
+
+    function getDefaultRemoteTarget() {
+      return settingsToggle;
+    }
+
     function restoreUsefulFocus() {
       if (isAnyModalOpen()) {
         return;
@@ -1622,7 +1633,7 @@
         return;
       }
 
-      focusTarget(getGridTargets()[0] || settingsToggle);
+      focusTarget(getDefaultRemoteTarget());
     }
 
     function getRemoteTargets() {
@@ -1642,6 +1653,16 @@
       const target = getRemoteTargetFromPointer(event);
       if (target) {
         focusTarget(target);
+      }
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (isAnyModalOpen()) {
+        return;
+      }
+
+      if (!getRemoteTargetFromPointer(event)) {
+        clearFocus();
       }
     });
 
@@ -1740,9 +1761,16 @@
       const visibleFocus = document.querySelector(".remote-focus");
       const active = remoteTargets.includes(document.activeElement) ? document.activeElement : visibleFocus;
       const isRemoteTarget = remoteTargets.includes(active);
-      const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", "Backspace", "Escape"];
+      const clearKeys = ["Escape", "Backspace", "BrowserBack", "Back", "GoBack", "Home", "BrowserHome"];
+      const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", ...clearKeys];
 
       if (!remoteKeys.includes(event.key)) {
+        return;
+      }
+
+      if (clearKeys.includes(event.key)) {
+        event.preventDefault();
+        clearFocus();
         return;
       }
 
@@ -1752,17 +1780,10 @@
         return;
       }
 
-      if ((event.key === "Backspace" || event.key === "Escape") && settingsMode) {
-        event.preventDefault();
-        settingsToggle.click();
-        focusTarget(getGridTargets()[0] || settingsToggle);
-        return;
-      }
-
       if (!isRemoteTarget) {
         if (event.key.startsWith("Arrow")) {
           event.preventDefault();
-          focusTarget(remoteTargets[0] || settingsToggle);
+          focusTarget(getDefaultRemoteTarget());
         }
         return;
       }
