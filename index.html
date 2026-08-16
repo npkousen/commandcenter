@@ -542,15 +542,28 @@
       background: rgba(255, 255, 255, 0.035);
     }
 
-    .version {
+    .site-footer {
       position: fixed;
       left: 50%;
       bottom: 12px;
       transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
       color: rgba(248, 250, 252, 0.56);
       font-size: 0.75rem;
       letter-spacing: 0;
-      pointer-events: none;
+    }
+
+    .site-footer a {
+      color: rgba(248, 250, 252, 0.72);
+      pointer-events: auto;
+    }
+
+    .site-footer a:hover,
+    .site-footer a:focus-visible {
+      color: #ffffff;
+      text-decoration: underline;
     }
 
     .modal-backdrop {
@@ -1249,7 +1262,11 @@
     </section>
   </div>
 
-  <div class="version">Version 0.2.0</div>
+  <div class="site-footer">
+    <span>Version 0.2.1</span>
+    <span aria-hidden="true">|</span>
+    <a href="privacy/">Privacy</a>
+  </div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";

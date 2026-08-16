@@ -2,7 +2,7 @@
 
 Kousen.CommandCenter is a lightweight homepage for launching home-hosted apps and simple live widgets from TVs, tablets, kiosk PCs, and normal browsers.
 
-Version: `0.2.0`
+Version: `0.2.1`
 
 The app is intentionally static-first. The primary experience lives in `index.html`, shared defaults live in `apps.json`, and visual assets live in `assets/`.
 
@@ -116,6 +116,7 @@ Draft icon explorations live in `assets/drafts/`, which is ignored by git.
 ## Files
 
 - `index.html` - complete static application
+- `privacy/index.html` - privacy policy page served at `/privacy`
 - `apps.json` - shared published defaults
 - `assets/` - image assets used by the static app
 - `CNAME` - GitHub Pages custom domain
@@ -136,6 +137,11 @@ CommandCenter is licensed under the MIT License. See `LICENSE`.
 Inline SVG icons are from Lucide. Lucide is licensed under the ISC License, and some Lucide icons are derived from Feather icons under the MIT License. See `THIRD_PARTY_NOTICES.md`.
 
 ## Release Notes
+
+### 0.2.1
+
+- Added a privacy policy page at `/privacy`.
+- Added a homepage privacy link next to the visible version.
 
 ### 0.2.0
 

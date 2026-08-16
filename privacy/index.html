@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>Privacy Policy | Kousen.CommandCenter</title>
+  <link rel="canonical" href="https://kousen.cc/privacy">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/logo-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(24, 34, 49, 0.9);
+      --panel-strong: rgba(15, 23, 42, 0.92);
+      --text: #f8fafc;
+      --muted: #aeb8c6;
+      --accent: #5ba37d;
+      --bg-base: #1e3a8a;
+      --bg-soft: #345296;
+      --bg-dark: #152961;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.62)),
+        url("../assets/bliss.png"),
+        radial-gradient(circle at top left, rgba(47, 128, 237, 0.24), transparent 36rem),
+        linear-gradient(135deg, var(--bg-base) 0%, var(--bg-soft) 46%, var(--bg-dark) 100%);
+      background-size: cover, cover, auto, auto;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.62;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus-visible {
+      text-decoration: underline;
+    }
+
+    .shell {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .topbar,
+    .policy {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.28rem, 3.2vw, 1.9rem);
+      line-height: 1.1;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .brand-kousen {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .brand-command {
+      font-size: 0.72em;
+      font-weight: 400;
+    }
+
+    .home-link {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .home-link:focus-visible {
+      outline: 4px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    .policy {
+      padding: clamp(22px, 4vw, 38px);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .eyebrow,
+    .meta,
+    .footer {
+      color: var(--muted);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h2,
+    h3,
+    p {
+      max-width: 74ch;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 30px 0 8px;
+      color: var(--text);
+      font-size: 1.08rem;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .lede {
+      margin-top: 16px;
+      color: #dbe5f2;
+      font-size: 1.04rem;
+    }
+
+    .meta {
+      margin-top: 18px;
+      font-size: 0.92rem;
+    }
+
+    ul {
+      max-width: 74ch;
+      margin: 0 0 16px 22px;
+      padding: 0;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    .note {
+      max-width: 74ch;
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+    }
+
+    .footer {
+      margin: 18px 0 0;
+      text-align: center;
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 24px, 920px);
+        padding: 12px 0;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .home-link {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="Kousen.CommandCenter home">
+        <img src="../assets/logo.png" alt="">
+        <h1><span class="brand-kousen">Kousen</span><span>.</span><span class="brand-command">CommandCenter</span></h1>
+      </a>
+      <a class="home-link" href="../">Back Home</a>
+    </header>
+
+    <article class="policy">
+      <p class="eyebrow">Privacy Policy</p>
+      <h2>CommandCenter keeps setup data on your device by default.</h2>
+      <p class="lede">
+        This policy applies to Kousen.CommandCenter, the static homepage available at kousen.cc.
+      </p>
+      <p class="meta"><strong>Last updated:</strong> August 16, 2026</p>
+
+      <h3>1. Information The App Handles</h3>
+      <p>
+        CommandCenter may handle information you enter or import, such as app names, app URLs, colors, logos,
+        homepage settings, layout choices, weather widget locations, clock widget time zones, and similar setup data.
+      </p>
+
+      <h3>2. Local Storage</h3>
+      <p>
+        The app uses your browser's local storage to save per-device overrides, including your customized app cards,
+        homepage settings, uploaded images, and layout preferences. This data stays in the browser profile on the
+        device you are using unless you export it or clear it.
+      </p>
+      <p>
+        If you clear browser storage, switch browsers, use another device, or use private browsing, those local settings
+        may not be available.
+      </p>
+
+      <h3>3. No Accounts or CommandCenter Backend</h3>
+      <p>
+        CommandCenter does not require user accounts and does not include its own backend database for storing your setup.
+        kousen.cc does not receive, store, or manage your local CommandCenter settings through the app itself.
+      </p>
+
+      <h3>4. Import and Export Files</h3>
+      <p>
+        You may export or import CommandCenter setup JSON files. Those files remain under your control on your own device
+        unless you choose to store, upload, or share them elsewhere.
+      </p>
+
+      <h3>5. Weather Widgets</h3>
+      <p>
+        If you configure a weather widget, the app may request forecast or geocoding data from Open-Meteo using the location
+        information needed for that widget. Those requests are separate from CommandCenter's local storage behavior and are
+        governed by Open-Meteo's own practices.
+      </p>
+
+      <h3>6. App Links and Third-Party Sites</h3>
+      <p>
+        CommandCenter is a launcher. When you open an app card, your browser leaves CommandCenter and visits the configured
+        destination. The destination site or service may collect information according to its own privacy policy.
+      </p>
+
+      <h3>7. Hosting and Technical Logs</h3>
+      <p>
+        When kousen.cc is hosted publicly, the hosting provider may process standard technical request data needed to deliver
+        the site, such as IP address, browser details, timestamps, requested paths, and basic server or CDN logs.
+      </p>
+
+      <h3>8. Cookies, Analytics, and Tracking</h3>
+      <p>
+        CommandCenter does not intentionally include advertising trackers, analytics dashboards, or behavioral profiling tools.
+        Essential browser and hosting mechanisms may still be used to load static files securely and reliably.
+      </p>
+
+      <h3>9. Data Security</h3>
+      <p>
+        Because custom setup data is generally stored in your own browser, protecting access to your device and browser profile
+        is important. Do not store sensitive secrets, passwords, or private tokens in app names, app URLs, or notes.
+      </p>
+
+      <h3>10. Children's Privacy</h3>
+      <p>
+        CommandCenter is not directed to children under 13, and kousen.cc does not knowingly collect personal information from
+        children through CommandCenter's local-first functionality.
+      </p>
+
+      <h3>11. Changes to This Policy</h3>
+      <p>
+        This Privacy Policy may be updated from time to time. The revised version will be posted on this page with a new
+        "Last updated" date.
+      </p>
+
+      <h3>12. Contact</h3>
+      <p>If you have questions about this Privacy Policy, contact:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:support@kousen.cc">support@kousen.cc</a></li>
+        <li><strong>Website:</strong> <a href="https://kousen.cc/">https://kousen.cc/</a></li>
+      </ul>
+
+      <div class="note">
+        <strong>Plain-English summary:</strong> CommandCenter is a static launcher. Your custom setup is saved in your own
+        browser by default, exported setup files leave the app only when you choose to save or share them, and public hosting
+        may still create routine technical access logs.
+      </div>
+    </article>
+
+    <p class="footer">Version 0.2.1</p>
+  </main>
+</body>
+</html>
