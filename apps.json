@@ -2,8 +2,8 @@
   "columns": 3,
   "homepageName": "Kousen",
   "accentColor": "#5ba37d",
-  "backgroundColor": "#111827",
-  "backgroundImage": "bliss.png",
+  "backgroundColor": "#1e3a8a",
+  "backgroundImage": "assets/bliss.png",
   "backgroundTransparency": 0,
   "apps": [
     {

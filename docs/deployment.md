@@ -1,6 +1,6 @@
 # Optional TrueNAS Deployment Strategy
 
-This project can deploy as a tiny static nginx container if a LAN-hosted or internet-independent version is needed later.
+This project can deploy as a tiny static nginx container if a LAN-hosted or internet-independent version is needed later. The image serves `index.html`, `apps.json`, and the `assets/` directory.
 
 The preferred first deployment target is GitHub Pages. See `docs/github-pages.md`.
 
@@ -14,7 +14,7 @@ TrueNAS management remains separate:
 
 ```text
 192.168.10.10 -> TrueNAS UI
-192.168.10.50 -> Kousen CommandCenter
+192.168.10.50 -> Kousen.CommandCenter
 ```
 
 ## One-Time TrueNAS Network Setup

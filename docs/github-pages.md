@@ -1,10 +1,11 @@
 # GitHub Pages Deployment
 
-GitHub Pages is the preferred first deployment target for Kousen CommandCenter.
+GitHub Pages is the preferred first deployment target for Kousen.CommandCenter.
 
-The app is a static `index.html`, so GitHub Pages can serve it directly from the repository root. No build step is required.
+The app is a static `index.html`, so GitHub Pages can serve it directly from the repository root. No build step is required. Shared defaults are loaded from `apps.json`, and static images are served from `assets/`.
 
 Shared app cards are defined in `apps.json`. Updating that file and pushing to `main` updates the published CommandCenter app list. The `columns` value controls whether the app grid uses 2, 3, or 4 columns; rows are calculated automatically.
+The default browser icon is `assets/logo.png`, and the default homepage background is `assets/bliss.png`.
 
 ## Cost
 

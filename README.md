@@ -1,8 +1,27 @@
-# Kousen CommandCenter
+# Kousen.CommandCenter
 
-Kousen CommandCenter is a lightweight LAN homepage for launching home-hosted apps such as KousenTV, Plex, music, photos, and future services.
+Kousen.CommandCenter is a lightweight homepage for launching home-hosted apps and simple live widgets from TVs, tablets, kiosk PCs, and normal browsers.
 
-The first version is intentionally static and contained in `index.html`. It can be opened directly in a browser, served by GitHub Pages, served from a small web server, or copied into a web-serving container later.
+Version: `0.2.0`
+
+The app is intentionally static-first. The primary experience lives in `index.html`, shared defaults live in `apps.json`, and visual assets live in `assets/`.
+
+## Deployment Model
+
+The preferred deployment target is GitHub Pages:
+
+```text
+git push -> GitHub Pages -> https://kousen.cc
+```
+
+GitHub Pages serves the homepage publicly. App cards can point to private LAN URLs such as:
+
+```text
+KousenTV -> http://192.168.10.10:8000
+Plex     -> http://192.168.10.10:32400/web
+```
+
+Those LAN cards only work from devices connected to the home network. This is expected.
 
 ## Local Testing
 
@@ -18,11 +37,9 @@ Then open:
 http://127.0.0.1:8080
 ```
 
-The app loads shared app cards from `apps.json`. Browser `localStorage` is used only for per-device overrides made through settings mode.
-
 ## Container Testing
 
-Build and run the local nginx container:
+The container path is optional. GitHub Pages is the simpler deployment for now.
 
 ```sh
 docker compose up -d --build
@@ -34,93 +51,92 @@ Then open:
 http://127.0.0.1:8080
 ```
 
-## Preferred Deployment
+## Configuration
 
-The preferred first deployment target is GitHub Pages:
+Shared defaults are loaded from `apps.json`. Devices with local settings overrides keep those overrides until **Reset to Defaults** is selected in settings mode.
 
-```text
-git push -> GitHub Pages -> https://kousen.cc
-```
-
-See `docs/github-pages.md` for the GitHub and Porkbun setup steps.
-
-## Current Behavior
-
-- The top-left title is `Kousen.CommandCenter`.
-- The top-right settings button toggles edit mode.
-- Edit mode shows column controls for `2`, `3`, and `4` columns.
-- Edit mode shows undo and redo controls for changes made during the current browser session.
-- Edit mode can export the current setup to JSON and import that setup later or on another device.
-- Edit mode includes an Edit Homepage control for the CommandCenter name, accent color, background color, background image, and image dim level.
-- Edit mode shows green add buttons in empty grid slots.
-- Link app cards open their configured URL in the same browser tab.
-- Weather and clock app cards render as live homepage widgets.
-- Existing cards can be edited or deleted while settings mode is on, with delete confirmation.
-- Existing cards can be reordered left or right while settings mode is on.
-- App cards can use initials or a custom uploaded logo.
-- Weather widgets use a ZIP code and refresh cadence. Clock widgets use a timezone and digital or analog display mode.
-- Published/shared app cards are defined in `apps.json`.
-- Settings changes made in the browser are stored as local overrides for that device.
-- The settings panel can reset a device back to the published `apps.json` list.
-- The grid and cards resize to fit the visible browser viewport without page scrolling.
-- Cards are capped at one-third of the shorter screen dimension so they do not dominate the TV display.
-- App cards support keyboard/remote navigation with arrow keys and Enter.
-- In settings mode, cards are not selectable; remote focus moves through the column controls, reset, add, edit, delete, reorder, and modal controls.
-
-## Updating Shared Apps
-
-Edit `apps.json`, commit the change, and push to `main`.
-
-GitHub Pages will publish the new app list automatically. Devices with no local overrides will pick up the published list on their next page load.
-
-`apps.json` uses `columns` to choose the layout width and can define the shared homepage defaults:
+Example:
 
 ```json
 {
   "columns": 3,
   "homepageName": "Kousen",
   "accentColor": "#5ba37d",
-  "backgroundColor": "#111827",
-  "backgroundImage": "bliss.png",
+  "backgroundColor": "#1e3a8a",
+  "backgroundImage": "assets/bliss.png",
   "backgroundTransparency": 0,
   "apps": []
 }
 ```
 
-Supported column counts are `2`, `3`, and `4`. Rows are calculated automatically from the configured apps.
-`backgroundTransparency` controls app card transparency and supports `0`, `25`, and `50`.
+Supported homepage values:
 
-CommandCenter displays a small version label at the bottom of the page. Increment the patch version by `0.0.1` for normal updates and the minor version by `0.1.0` for larger releases.
+- `columns`: `2`, `3`, or `4`
+- `homepageName`: title prefix before `.CommandCenter`
+- `accentColor`: color for the homepage name and active controls
+- `backgroundColor`: base gradient color and translucent top bar color
+- `backgroundImage`: optional image path or local data URL
+- `backgroundTransparency`: app card transparency level, using `0`, `25`, or `50`
 
-## Optional LAN Deployment Strategy
+Supported app card types:
 
-If internet-independent hosting is needed later, the clean TrueNAS/LAN target is:
+- `link`: opens a configured URL in the same browser tab
+- `weather`: uses a ZIP code and refresh cadence to render a live weather tile
+- `clock`: uses a timezone and digital or analog display style
+
+## Current UX
+
+- The title renders as accent-colored `Kousen` plus white `.CommandCenter`.
+- `assets/logo.png` is used as the browser favicon/app icon.
+- `assets/bliss.png` is the default background image.
+- The default background color is Blue.
+- App cards resize to fit the viewport without page scrolling.
+- Cards are capped at one-third of the shorter viewport dimension.
+- Settings mode supports add, edit, delete, reorder, undo, redo, import, export, homepage editing, and layout changes.
+- Keyboard and remote navigation use arrow keys and Enter.
+- Escape, remote back/home, or clicking outside a control clears the current highlight.
+- In settings mode, app cards are not selectable; their controls are selectable instead.
+
+## Assets
 
 ```text
-kousen.cc -> 192.168.10.50
+assets/
+  bliss.png  default homepage background
+  logo.png   favicon/app icon
 ```
 
-Where `192.168.10.50` is an additional static IP/alias on the TrueNAS host reserved for CommandCenter. The TrueNAS management UI should remain bound to its management address, for example:
-
-```text
-192.168.10.10 -> TrueNAS UI
-192.168.10.50 -> Kousen CommandCenter
-```
-
-DNS can point `kousen.cc` at the CommandCenter IP, but DNS cannot include a port. For `http://kousen.cc` to work, CommandCenter must answer on port `80`.
-
-See `docs/deployment.md` for the optional TrueNAS compose and GitHub Container Registry deployment flow.
+`bliss.png` is intentionally referenced as a file instead of embedded in `index.html`. It is large enough that embedding it as base64 would make the page and local settings harder to manage.
+Keep raw source images, such as `assets/bliss_raw.png`, out of published builds unless they are intentionally needed at runtime.
 
 ## Files
 
-- `index.html` - complete application
-- `CNAME` - custom domain for GitHub Pages
+- `index.html` - complete static application
+- `apps.json` - shared published defaults
+- `assets/` - image assets used by the static app
+- `CNAME` - GitHub Pages custom domain
 - `Dockerfile` - optional static nginx container
 - `docker-compose.yml` - optional local container run
-- `deploy/truenas-compose.yml` - TrueNAS deployment compose file
-- `.github/workflows/publish-image.yml` - manual workflow for publishing the optional container image
-- `docs/github-pages.md` - GitHub Pages and Porkbun DNS setup
-- `docs/deployment.md` - LAN, DNS, TrueNAS, and CI/CD notes
-- `.dockerignore` - keeps container context small
-- `.gitignore` - excludes local/editor/generated files
-- `ASSISTANT.md` - implementation notes for future assistant work
+- `deploy/truenas-compose.yml` - optional TrueNAS deployment compose file
+- `.github/workflows/publish-image.yml` - manual container publish workflow
+- `docs/github-pages.md` - GitHub Pages and Porkbun DNS notes
+- `docs/deployment.md` - optional LAN/TrueNAS deployment notes
+- `LICENSE` - CommandCenter project license
+- `THIRD_PARTY_NOTICES.md` - Lucide/Feather icon attribution
+- `ASSISTANT.md` - project notes for future assistant work
+
+## Licensing
+
+CommandCenter is licensed under the MIT License. See `LICENSE`.
+
+Inline SVG icons are from Lucide. Lucide is licensed under the ISC License, and some Lucide icons are derived from Feather icons under the MIT License. See `THIRD_PARTY_NOTICES.md`.
+
+## Release Notes
+
+### 0.2.0
+
+- Added favicon/app icon support from `assets/logo.png`.
+- Moved visual assets into `assets/`.
+- Changed the default background color to Blue.
+- Kept `assets/bliss.png` as the default background image.
+- Added project license and third-party icon notices.
+- Refreshed docs for the current deployment and UX model.

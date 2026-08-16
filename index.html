@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#1e3a8a">
   <title>Kousen.CommandCenter</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
   <style>
     :root {
       color-scheme: dark;
-      --bg: #111827;
+      --bg: #1e3a8a;
       --panel: #182231;
       --panel-2: #202c3d;
       --text: #f8fafc;
@@ -16,12 +18,12 @@
       --line: #314156;
       --brand-accent: #ef4444;
       --accent: var(--brand-accent);
-      --bg-base: #111827;
-      --bg-soft: #172033;
-      --bg-dark: #10151f;
+      --bg-base: #1e3a8a;
+      --bg-soft: #345296;
+      --bg-dark: #152961;
       --bg-glow: #2f80ed;
       --topbar-bg: rgba(24, 34, 49, 0.88);
-      --bg-base-rgb: 17, 24, 39;
+      --bg-base-rgb: 30, 58, 138;
       --bg-glow-rgb: 47, 128, 237;
       --green: #22c55e;
       --green-dark: #12823a;
@@ -1217,7 +1219,7 @@
         <div class="field">
           <label for="backgroundColorInput">Background Color</label>
           <div class="color-select" data-color-select>
-            <input class="color-select-input" id="backgroundColorInput" value="#111827">
+            <input class="color-select-input" id="backgroundColorInput" value="#1e3a8a">
             <button class="color-select-button" type="button" aria-haspopup="listbox" aria-expanded="false">
               <span class="color-select-value"></span>
               <span aria-hidden="true">▾</span>
@@ -1256,7 +1258,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.12</div>
+  <div class="version">Version 0.2.0</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -1264,8 +1266,8 @@
     const CONFIG_URL = "apps.json";
     const COLUMN_OPTIONS = [2, 3, 4];
     const DEFAULT_ACCENT_COLOR = "#5ba37d";
-    const DEFAULT_BACKGROUND_COLOR = "#111827";
-    const DEFAULT_BACKGROUND_IMAGE = "bliss.png";
+    const DEFAULT_BACKGROUND_COLOR = "#1e3a8a";
+    const DEFAULT_BACKGROUND_IMAGE = "assets/bliss.png";
     const DEFAULT_HOMEPAGE_NAME = "Kousen";
     const DEFAULT_BACKGROUND_TRANSPARENCY = 0;
     const FALLBACK_STATE = {
@@ -1452,7 +1454,7 @@
         homepageName: normalizeHomepageName(candidate.homepageName),
         accentColor: normalizeColor(candidate.accentColor, DEFAULT_ACCENT_COLOR),
         backgroundColor: normalizeColor(candidate.backgroundColor, DEFAULT_BACKGROUND_COLOR),
-        backgroundImage: String(candidate.backgroundImage || ""),
+        backgroundImage: normalizeBackgroundImage(candidate.backgroundImage),
         backgroundTransparency: normalizeTransparency(candidate.backgroundTransparency),
         apps
       };
@@ -1538,6 +1540,11 @@
       return [0, 25, 50].includes(transparency) ? transparency : DEFAULT_BACKGROUND_TRANSPARENCY;
     }
 
+    function normalizeBackgroundImage(value) {
+      const image = String(value || "").trim();
+      return image === "bliss.png" ? DEFAULT_BACKGROUND_IMAGE : image;
+    }
+
     function readLocalOverride() {
       try {
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -1610,7 +1617,7 @@
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.1.12",
+        version: "0.2.0",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -2609,7 +2616,8 @@
     });
     backgroundFileInput.addEventListener("change", () => {
       const file = backgroundFileInput.files[0];
-      if (file?.name?.toLowerCase() === DEFAULT_BACKGROUND_IMAGE) {
+      const defaultBackgroundFile = DEFAULT_BACKGROUND_IMAGE.split("/").pop().toLowerCase();
+      if (file?.name?.toLowerCase() === defaultBackgroundFile) {
         pendingBackgroundImage = DEFAULT_BACKGROUND_IMAGE;
         renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
         previewHomepageTheme();
