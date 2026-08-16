@@ -27,7 +27,7 @@
       --green-dark: #12823a;
       --danger: #ef4444;
       --background-image: none;
-      --background-overlay-opacity: 0.50;
+      --app-card-opacity: 1;
       --shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -46,13 +46,12 @@
       min-height: 100%;
       margin: 0;
       background:
-        linear-gradient(rgba(var(--bg-base-rgb), var(--background-overlay-opacity)), rgba(var(--bg-base-rgb), var(--background-overlay-opacity))),
         var(--background-image),
         radial-gradient(circle at top left, rgba(var(--bg-glow-rgb), 0.24), transparent 36rem),
         linear-gradient(135deg, var(--bg-base) 0%, var(--bg-soft) 46%, var(--bg-dark) 100%);
-      background-size: cover, cover, auto, auto;
-      background-position: center, center, center, center;
-      background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+      background-size: cover, auto, auto;
+      background-position: center, center, center;
+      background-repeat: no-repeat, no-repeat, no-repeat;
       color: var(--text);
     }
 
@@ -103,7 +102,7 @@
     }
 
     .brand-kousen {
-      color: var(--text);
+      color: var(--brand-accent);
       font-weight: 800;
     }
 
@@ -113,7 +112,8 @@
     }
 
     .brand-command {
-      color: var(--brand-accent);
+      color: var(--text);
+      font-size: 0.72em;
       font-weight: 400;
     }
 
@@ -330,12 +330,22 @@
     .app-card {
       position: relative;
       padding: clamp(10px, 2vw, 20px);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035)),
-        var(--card-color);
+      background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow: var(--shadow);
       transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035)),
+        var(--card-color);
+      opacity: var(--app-card-opacity);
+      pointer-events: none;
     }
 
     .app-card:focus-visible,
@@ -352,6 +362,8 @@
     }
 
     .app-content {
+      position: relative;
+      z-index: 1;
       display: grid;
       place-items: center;
       gap: clamp(8px, 1.4vw, 14px);
@@ -439,6 +451,7 @@
     .edit-actions {
       position: absolute;
       top: 8px;
+      z-index: 2;
       display: none;
       gap: 6px;
     }
@@ -1190,12 +1203,12 @@
               <button class="secondary" id="backgroundUploadButton" type="button"></button>
               <button class="secondary" id="backgroundClearButton" type="button"></button>
               <div class="transparency-group">
-                <div class="transparency-options" role="group" aria-label="Background transparency">
+                <div class="transparency-options" role="group" aria-label="App transparency">
+                  <button class="transparency-button" type="button" data-transparency="0">0%</button>
                   <button class="transparency-button" type="button" data-transparency="25">25%</button>
                   <button class="transparency-button" type="button" data-transparency="50">50%</button>
-                  <button class="transparency-button" type="button" data-transparency="75">75%</button>
                 </div>
-                <div class="transparency-label">Image Dim Level</div>
+                <div class="transparency-label">App Transparency Level</div>
               </div>
             </div>
           </div>
@@ -1243,7 +1256,7 @@
     </section>
   </div>
 
-  <div class="version">Version 0.1.11</div>
+  <div class="version">Version 0.1.12</div>
 
   <script>
     const STORAGE_KEY = "kousen-commandcenter:user-state:v2";
@@ -1254,7 +1267,7 @@
     const DEFAULT_BACKGROUND_COLOR = "#111827";
     const DEFAULT_BACKGROUND_IMAGE = "bliss.png";
     const DEFAULT_HOMEPAGE_NAME = "Kousen";
-    const DEFAULT_BACKGROUND_TRANSPARENCY = 25;
+    const DEFAULT_BACKGROUND_TRANSPARENCY = 0;
     const FALLBACK_STATE = {
       columns: 3,
       homepageName: DEFAULT_HOMEPAGE_NAME,
@@ -1522,7 +1535,7 @@
 
     function normalizeTransparency(value) {
       const transparency = Number(value);
-      return [25, 50, 75].includes(transparency) ? transparency : DEFAULT_BACKGROUND_TRANSPARENCY;
+      return [0, 25, 50].includes(transparency) ? transparency : DEFAULT_BACKGROUND_TRANSPARENCY;
     }
 
     function readLocalOverride() {
@@ -1597,7 +1610,7 @@
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.1.11",
+        version: "0.1.12",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -1728,7 +1741,7 @@
       const accentColor = normalizeColor(themeState.accentColor, DEFAULT_ACCENT_COLOR);
       const homepageName = normalizeHomepageName(themeState.homepageName);
       const backgroundColor = normalizeColor(themeState.backgroundColor, DEFAULT_BACKGROUND_COLOR);
-      const backgroundTransparency = normalizeTransparency(themeState.backgroundTransparency);
+      const appTransparency = normalizeTransparency(themeState.backgroundTransparency);
       const softBackground = mixHex(backgroundColor, "#ffffff", 0.10);
       const darkBackground = mixHex(backgroundColor, "#000000", 0.28);
       const glowBackground = mixHex(backgroundColor, "#ffffff", 0.34);
@@ -1745,7 +1758,7 @@
       document.documentElement.style.setProperty("--bg-glow-rgb", rgbString(glowBackground));
       document.documentElement.style.setProperty("--topbar-bg", `rgba(${rgbString(topbarBackground)}, 0.90)`);
       document.documentElement.style.setProperty("--background-image", themeState.backgroundImage ? `url(${JSON.stringify(themeState.backgroundImage)})` : "none");
-      document.documentElement.style.setProperty("--background-overlay-opacity", String(backgroundTransparency / 100));
+      document.documentElement.style.setProperty("--app-card-opacity", String(1 - appTransparency / 100));
     }
 
     function previewHomepageTheme() {

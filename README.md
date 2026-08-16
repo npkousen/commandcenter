@@ -82,12 +82,13 @@ GitHub Pages will publish the new app list automatically. Devices with no local 
   "accentColor": "#5ba37d",
   "backgroundColor": "#111827",
   "backgroundImage": "bliss.png",
-  "backgroundTransparency": 25,
+  "backgroundTransparency": 0,
   "apps": []
 }
 ```
 
 Supported column counts are `2`, `3`, and `4`. Rows are calculated automatically from the configured apps.
+`backgroundTransparency` controls app card transparency and supports `0`, `25`, and `50`.
 
 CommandCenter displays a small version label at the bottom of the page. Increment the patch version by `0.0.1` for normal updates and the minor version by `0.1.0` for larger releases.
 

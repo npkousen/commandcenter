@@ -4,7 +4,7 @@
   "accentColor": "#5ba37d",
   "backgroundColor": "#111827",
   "backgroundImage": "bliss.png",
-  "backgroundTransparency": 25,
+  "backgroundTransparency": 0,
   "apps": [
     {
       "id": "kousentv",
