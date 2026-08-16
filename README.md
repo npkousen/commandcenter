@@ -87,7 +87,7 @@ Supported app card types:
 ## Current UX
 
 - The title renders as accent-colored `Kousen` plus white `.CommandCenter`.
-- `assets/logo.png` is used as the browser favicon/app icon.
+- `assets/command-center-icon-final.png` is the full-resolution app icon source, with browser/mobile sizes exported alongside it.
 - `assets/bliss.png` is the default background image.
 - The default background color is Blue.
 - App cards resize to fit the viewport without page scrolling.
@@ -101,12 +101,17 @@ Supported app card types:
 
 ```text
 assets/
-  bliss.png  default homepage background
-  logo.png   favicon/app icon
+  apple-touch-icon.png  Apple touch icon
+  bliss.png             default homepage background
+  command-center-icon-final.png  full-resolution app icon source
+  favicon-32.png        browser favicon
+  logo-192.png          192px browser/mobile icon
+  logo.png              512px app icon
 ```
 
 `bliss.png` is intentionally referenced as a file instead of embedded in `index.html`. It is large enough that embedding it as base64 would make the page and local settings harder to manage.
 Keep raw source images, such as `assets/bliss_raw.png`, out of published builds unless they are intentionally needed at runtime.
+Draft icon explorations live in `assets/drafts/`, which is ignored by git.
 
 ## Files
 

@@ -9,3 +9,4 @@ coverage/
 .env.*
 !.env.example
 assets/*_raw.*
+assets/drafts/
