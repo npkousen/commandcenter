@@ -10,12 +10,9 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #1e3a8a;
       --panel: #182231;
-      --panel-2: #202c3d;
       --text: #f8fafc;
       --muted: #aeb8c6;
-      --line: #314156;
       --brand-accent: #ef4444;
       --accent: var(--brand-accent);
       --bg-base: #1e3a8a;
@@ -26,7 +23,6 @@
       --bg-base-rgb: 30, 58, 138;
       --bg-glow-rgb: 47, 128, 237;
       --green: #22c55e;
-      --green-dark: #12823a;
       --danger: #ef4444;
       --background-image: none;
       --app-card-opacity: 1;
@@ -200,12 +196,6 @@
 
     .settings-on .controls {
       display: flex;
-    }
-
-    .mode-copy {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.94rem;
     }
 
     .button-cluster {
@@ -1074,7 +1064,7 @@
         <input type="hidden" id="editingId">
         <input type="hidden" id="appTypeInput" value="link">
 
-        <div class="field" id="nameField">
+        <div class="field">
           <label for="nameInput" id="nameInputLabel">App Name</label>
           <div class="text-entry-row">
             <input id="nameInput" name="name" autocomplete="off" required maxlength="36" placeholder="KousenTV">
@@ -1338,7 +1328,6 @@
     const appTypeInput = document.getElementById("appTypeInput");
     const weatherModeButton = document.getElementById("weatherModeButton");
     const clockModeButton = document.getElementById("clockModeButton");
-    const nameField = document.getElementById("nameField");
     const nameInputLabel = document.getElementById("nameInputLabel");
     const nameInput = document.getElementById("nameInput");
     const nameKeyboardButton = document.getElementById("nameKeyboardButton");
@@ -1389,7 +1378,6 @@
     let currentWeatherCadence = 30;
     let currentClockStyle = "digital";
     let pendingBackgroundImage = "";
-    let pendingBackgroundColor = DEFAULT_BACKGROUND_COLOR;
     let pendingBackgroundTransparency = DEFAULT_BACKGROUND_TRANSPARENCY;
     let pendingDeleteId = "";
     let keyboardTargetInput = null;
@@ -2078,7 +2066,6 @@
       setColorSelectValue(homepageAccentInput, normalizeColor(state.accentColor, DEFAULT_ACCENT_COLOR));
       setColorSelectValue(backgroundColorInput, normalizeColor(state.backgroundColor, DEFAULT_BACKGROUND_COLOR));
       pendingBackgroundImage = state.backgroundImage || "";
-      pendingBackgroundColor = normalizeColor(state.backgroundColor, DEFAULT_BACKGROUND_COLOR);
       pendingBackgroundTransparency = normalizeTransparency(state.backgroundTransparency);
       renderImagePreview(backgroundPreview, pendingBackgroundImage, "No image selected");
       updateTransparencyButtons();
@@ -2088,7 +2075,6 @@
 
     function closeBackgroundDialog() {
       pendingBackgroundImage = "";
-      pendingBackgroundColor = DEFAULT_BACKGROUND_COLOR;
       pendingBackgroundTransparency = DEFAULT_BACKGROUND_TRANSPARENCY;
       backgroundFileInput.value = "";
       backgroundBackdrop.classList.remove("open");
@@ -2640,7 +2626,6 @@
     homepageNameInput.addEventListener("input", previewHomepageTheme);
     homepageAccentInput.addEventListener("change", previewHomepageTheme);
     backgroundColorInput.addEventListener("change", () => {
-      pendingBackgroundColor = normalizeColor(backgroundColorInput.value, DEFAULT_BACKGROUND_COLOR);
       previewHomepageTheme();
     });
     cancelBackground.addEventListener("click", closeBackgroundDialog);
