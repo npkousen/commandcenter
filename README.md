@@ -2,7 +2,7 @@
 
 Kousen.CommandCenter is a lightweight homepage for launching home-hosted apps and simple live widgets from TVs, tablets, kiosk PCs, and normal browsers.
 
-Version: `0.2.1`
+Version: `0.2.2`
 
 The app is intentionally static-first. The primary experience lives in `index.html`, shared defaults live in `apps.json`, and visual assets live in `assets/`.
 
@@ -93,6 +93,7 @@ Supported app card types:
 - App cards resize to fit the viewport without page scrolling.
 - Cards are capped at one-third of the shorter viewport dimension.
 - Settings mode supports add, edit, delete, reorder, undo, redo, import, export, homepage editing, and layout changes.
+- Settings mode includes a Remote Settings panel for kousen-remote status, button mapping, and key testing.
 - Keyboard and remote navigation use arrow keys and Enter.
 - Escape, remote back/home, or clicking outside a control clears the current highlight.
 - In settings mode, app cards are not selectable; their controls are selectable instead.
@@ -137,6 +138,12 @@ CommandCenter is licensed under the MIT License. See `LICENSE`.
 Inline SVG icons are from Lucide. Lucide is licensed under the ISC License, and some Lucide icons are derived from Feather icons under the MIT License. See `THIRD_PARTY_NOTICES.md`.
 
 ## Release Notes
+
+### 0.2.2
+
+- Added a Remote Settings panel for future kousen-remote integration.
+- Added a remote key test view that displays the last captured key event.
+- Added a default Apple Siri Remote button mapping reference.
 
 ### 0.2.1
 

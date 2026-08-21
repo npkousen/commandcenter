@@ -978,6 +978,109 @@
       line-height: 1.35;
     }
 
+    .remote-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .remote-panel.hidden {
+      display: none;
+    }
+
+    .remote-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 780;
+    }
+
+    .remote-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .remote-detail-grid {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 8px 18px;
+      align-items: center;
+    }
+
+    .remote-label {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .remote-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .remote-connected {
+      color: #7dd3a4;
+      font-weight: 740;
+    }
+
+    .remote-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .remote-test-surface {
+      min-height: 170px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.055);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .remote-test-surface:focus-visible,
+    .remote-test-surface.remote-focus {
+      outline: 4px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    .remote-test-key {
+      display: block;
+      margin-top: 10px;
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .remote-map {
+      display: grid;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .remote-map-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1fr);
+      gap: 14px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .remote-map-row + .remote-map-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .remote-map-row.header {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+
+    .remote-feedback {
+      min-height: 1.2em;
+    }
+
     @media (max-width: 720px) {
       .topbar {
         min-height: 68px;
@@ -1045,6 +1148,7 @@
       <section class="controls" aria-label="Layout controls">
         <div class="settings-actions">
           <div class="button-cluster" role="group" aria-label="Theme controls">
+            <button class="panel-icon-button homepage-button" id="remoteButton" type="button" aria-label="Remote settings" title="Remote Settings"></button>
             <button class="panel-icon-button homepage-button" id="backgroundButton" type="button" aria-label="Edit homepage" title="Edit Homepage"></button>
           </div>
           <div class="button-cluster" role="group" aria-label="Grid size">
@@ -1246,6 +1350,74 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="remoteBackdrop" role="presentation">
+    <section class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="remoteTitle">
+      <div class="dialog-header">
+        <h2 class="dialog-title" id="remoteTitle">Remote Settings</h2>
+      </div>
+      <div class="form">
+        <div class="remote-panel" id="remoteStatusPanel">
+          <h3 class="remote-title">KousenTV Living Room</h3>
+          <div class="remote-divider"></div>
+          <div class="remote-detail-grid">
+            <span class="remote-label">Remote</span>
+            <span class="remote-value">Apple Siri Remote (3rd Generation)</span>
+            <span class="remote-label">Status</span>
+            <span class="remote-value remote-connected">● Connected</span>
+            <span class="remote-label">Battery</span>
+            <span class="remote-value">94%</span>
+            <span class="remote-label">Signal</span>
+            <span class="remote-value">-41 dBm</span>
+          </div>
+          <p class="hint remote-feedback" id="remoteFeedback"></p>
+          <div class="remote-actions">
+            <button class="primary" id="remoteTestButton" type="button">Test Remote</button>
+            <button class="secondary" id="remoteConfigureButton" type="button">Configure Buttons</button>
+            <button class="secondary" id="remotePairButton" type="button">Re-pair</button>
+            <button class="danger" id="remoteForgetButton" type="button">Forget Device</button>
+          </div>
+        </div>
+
+        <div class="remote-panel hidden" id="remoteTestPanel">
+          <div class="remote-test-surface" id="remoteTestSurface" tabindex="0">
+            <span>
+              Press a remote or keyboard button
+              <span class="remote-test-key" id="remoteLastKey">Waiting...</span>
+            </span>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="remoteTestBack" type="button">Back</button>
+          </div>
+        </div>
+
+        <div class="remote-panel hidden" id="remoteConfigurePanel">
+          <div class="remote-map" aria-label="Remote button mapping">
+            <div class="remote-map-row header">
+              <span>Remote Button</span>
+              <span>Linux Output</span>
+            </div>
+            <div class="remote-map-row"><span>Up</span><span>↑ Arrow Up</span></div>
+            <div class="remote-map-row"><span>Down</span><span>↓ Arrow Down</span></div>
+            <div class="remote-map-row"><span>Left</span><span>← Arrow Left</span></div>
+            <div class="remote-map-row"><span>Right</span><span>→ Arrow Right</span></div>
+            <div class="remote-map-row"><span>Center</span><span>Enter</span></div>
+            <div class="remote-map-row"><span>Back</span><span>Escape</span></div>
+            <div class="remote-map-row"><span>TV</span><span>Home</span></div>
+            <div class="remote-map-row"><span>Play/Pause</span><span>Media Play/Pause</span></div>
+            <div class="remote-map-row"><span>Volume +</span><span>Volume Up</span></div>
+            <div class="remote-map-row"><span>Volume −</span><span>Volume Down</span></div>
+            <div class="remote-map-row"><span>Mute</span><span>Mute</span></div>
+            <div class="remote-map-row"><span>Power</span><span>Suspend / custom action</span></div>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="remoteConfigureBack" type="button">Back</button>
+            <button class="primary" id="remoteSaveMapping" type="button">Save Mapping</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="keyboardBackdrop" role="presentation">
     <section class="dialog wide virtual-keyboard" role="dialog" aria-modal="true" aria-labelledby="keyboardTitle">
       <div class="dialog-header">
@@ -1263,7 +1435,7 @@
   </div>
 
   <div class="site-footer">
-    <span>Version 0.2.1</span>
+    <span>Version 0.2.2</span>
     <span aria-hidden="true">|</span>
     <a href="privacy/">Privacy</a>
   </div>
@@ -1319,6 +1491,7 @@
       columns3: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>',
       columns4: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7.5 3v18"/><path d="M12 3v18"/><path d="M16.5 3v18"/></svg>',
       wallpaper: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v4"/><path d="M8 21h8"/><path d="m9 17 6.1-6.1a2 2 0 0 1 2.81.01L22 15"/><circle cx="8" cy="9" r="2"/><rect x="2" y="3" width="20" height="14" rx="2"/></svg>',
+      remote: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.146 15.854a1.207 1.207 0 0 1 1.708 0l1.56 1.56A2 2 0 0 1 15 18.828V21a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2.172a2 2 0 0 1 .586-1.414z"/><path d="M18.828 15a2 2 0 0 1-1.414-.586l-1.56-1.56a1.207 1.207 0 0 1 0-1.708l1.56-1.56A2 2 0 0 1 18.828 9H21a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1z"/><path d="M6.586 14.414A2 2 0 0 1 5.172 15H3a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h2.172a2 2 0 0 1 1.414.586l1.56 1.56a1.207 1.207 0 0 1 0 1.708z"/><path d="M9 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.172a2 2 0 0 1-.586 1.414l-1.56 1.56a1.207 1.207 0 0 1-1.708 0l-1.56-1.56A2 2 0 0 1 9 5.172z"/></svg>',
       imageUp: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"/><path d="m14 19.5 3-3 3 3"/><path d="M17 22v-5.5"/><circle cx="9" cy="9" r="2"/></svg>',
       trash: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
       keyboard: '<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>',
@@ -1336,6 +1509,7 @@
     const importFileInput = document.getElementById("importFileInput");
     const undoButton = document.getElementById("undoButton");
     const redoButton = document.getElementById("redoButton");
+    const remoteButton = document.getElementById("remoteButton");
     const backgroundButton = document.getElementById("backgroundButton");
     const modalBackdrop = document.getElementById("modalBackdrop");
     const appForm = document.getElementById("appForm");
@@ -1377,6 +1551,20 @@
     const backgroundClearButton = document.getElementById("backgroundClearButton");
     const cancelBackground = document.getElementById("cancelBackground");
     const saveBackground = document.getElementById("saveBackground");
+    const remoteBackdrop = document.getElementById("remoteBackdrop");
+    const remoteStatusPanel = document.getElementById("remoteStatusPanel");
+    const remoteTestPanel = document.getElementById("remoteTestPanel");
+    const remoteConfigurePanel = document.getElementById("remoteConfigurePanel");
+    const remoteFeedback = document.getElementById("remoteFeedback");
+    const remoteTestButton = document.getElementById("remoteTestButton");
+    const remoteConfigureButton = document.getElementById("remoteConfigureButton");
+    const remotePairButton = document.getElementById("remotePairButton");
+    const remoteForgetButton = document.getElementById("remoteForgetButton");
+    const remoteTestSurface = document.getElementById("remoteTestSurface");
+    const remoteLastKey = document.getElementById("remoteLastKey");
+    const remoteTestBack = document.getElementById("remoteTestBack");
+    const remoteConfigureBack = document.getElementById("remoteConfigureBack");
+    const remoteSaveMapping = document.getElementById("remoteSaveMapping");
     const keyboardBackdrop = document.getElementById("keyboardBackdrop");
     const keyboardDisplay = document.getElementById("keyboardDisplay");
     const keyboardGrid = document.getElementById("keyboardGrid");
@@ -1623,7 +1811,7 @@
     function exportSetup() {
       const payload = {
         commandCenter: "Kousen.CommandCenter",
-        version: "0.2.0",
+        version: "0.2.2",
         exportedAt: new Date().toISOString(),
         ...cloneState(state)
       };
@@ -2107,6 +2295,46 @@
       });
     }
 
+    function showRemotePanel(panel) {
+      [remoteStatusPanel, remoteTestPanel, remoteConfigurePanel].forEach((item) => {
+        item.classList.toggle("hidden", item !== panel);
+      });
+    }
+
+    function openRemoteDialog() {
+      remoteFeedback.textContent = "";
+      remoteLastKey.textContent = "Waiting...";
+      showRemotePanel(remoteStatusPanel);
+      remoteBackdrop.classList.add("open");
+      focusTarget(remoteTestButton);
+    }
+
+    function closeRemoteDialog() {
+      remoteBackdrop.classList.remove("open");
+      remoteFeedback.textContent = "";
+      remoteLastKey.textContent = "Waiting...";
+      showRemotePanel(remoteStatusPanel);
+    }
+
+    function openRemoteTestPanel() {
+      remoteLastKey.textContent = "Waiting...";
+      showRemotePanel(remoteTestPanel);
+      focusTarget(remoteTestSurface);
+    }
+
+    function openRemoteConfigurePanel() {
+      showRemotePanel(remoteConfigurePanel);
+      focusTarget(remoteConfigureBack);
+    }
+
+    function updateRemoteTestKey(event) {
+      const parts = [event.key];
+      if (event.code && event.code !== event.key) {
+        parts.push(event.code);
+      }
+      remoteLastKey.textContent = parts.join(" / ");
+    }
+
     function renderImagePreview(preview, image, emptyText) {
       preview.innerHTML = "";
       if (!image) {
@@ -2454,6 +2682,7 @@
       setIcon(importButton, ICONS.import);
       setIcon(undoButton, ICONS.undo);
       setIcon(redoButton, ICONS.redo);
+      setIcon(remoteButton, ICONS.remote, "Remote Settings");
       setIcon(backgroundButton, ICONS.wallpaper, "Edit Homepage");
       setIcon(logoUploadButton, ICONS.imageUp, "Upload Image");
       setIcon(logoClearButton, ICONS.trash, "Clear Image");
@@ -2479,6 +2708,7 @@
       }
 
       return [
+        remoteButton,
         backgroundButton,
         ...getColumnButtons(),
         resetPublished,
@@ -2605,6 +2835,36 @@
       commitState(() => {
         state.apps = state.apps.filter((item) => item.id !== id);
       });
+    });
+
+    remoteButton.addEventListener("click", openRemoteDialog);
+    remoteBackdrop.addEventListener("click", (event) => {
+      if (event.target === remoteBackdrop) {
+        closeRemoteDialog();
+      }
+    });
+    remoteTestButton.addEventListener("click", openRemoteTestPanel);
+    remoteConfigureButton.addEventListener("click", openRemoteConfigurePanel);
+    remotePairButton.addEventListener("click", () => {
+      remoteFeedback.textContent = "Re-pair requires the kiosk-local remote agent.";
+      focusTarget(remotePairButton);
+    });
+    remoteForgetButton.addEventListener("click", () => {
+      remoteFeedback.textContent = "Forget Device requires the kiosk-local remote agent.";
+      focusTarget(remoteForgetButton);
+    });
+    remoteTestBack.addEventListener("click", () => {
+      showRemotePanel(remoteStatusPanel);
+      focusTarget(remoteTestButton);
+    });
+    remoteConfigureBack.addEventListener("click", () => {
+      showRemotePanel(remoteStatusPanel);
+      focusTarget(remoteConfigureButton);
+    });
+    remoteSaveMapping.addEventListener("click", () => {
+      showRemotePanel(remoteStatusPanel);
+      remoteFeedback.textContent = "Saving mappings requires the kiosk-local remote agent.";
+      focusTarget(remoteConfigureButton);
     });
 
     backgroundButton.addEventListener("click", openBackgroundDialog);
@@ -2743,6 +3003,7 @@
 
     function getActiveModal() {
       if (keyboardBackdrop.classList.contains("open")) return keyboardBackdrop;
+      if (remoteBackdrop.classList.contains("open")) return remoteBackdrop;
       if (modalBackdrop.classList.contains("open")) return modalBackdrop;
       if (deleteBackdrop.classList.contains("open")) return deleteBackdrop;
       if (backgroundBackdrop.classList.contains("open")) return backgroundBackdrop;
@@ -2758,6 +3019,7 @@
       if (modalBackdrop.classList.contains("open")) closeDialogBox();
       if (deleteBackdrop.classList.contains("open")) closeDeleteDialog();
       if (backgroundBackdrop.classList.contains("open")) closeBackgroundDialog();
+      if (remoteBackdrop.classList.contains("open")) closeRemoteDialog();
     }
 
     function getGridTargets() {
@@ -2773,6 +3035,7 @@
 
       const targetSelector = [
         "input:not([type='hidden']):not(.file-input)",
+        "[tabindex='0']",
         ".color-select-button",
         ".color-select.open .color-option",
         "button:not(:disabled)"
@@ -2857,6 +3120,7 @@
       const activeModal = getActiveModal();
       if (activeModal) {
         if (activeModal === keyboardBackdrop) return keyboardDisplay;
+        if (activeModal === remoteBackdrop) return remoteTestButton;
         if (activeModal === modalBackdrop) return nameInput;
         if (activeModal === deleteBackdrop) return cancelDelete;
         if (activeModal === backgroundBackdrop) return homepageNameInput;
@@ -3021,6 +3285,12 @@
       const isRemoteTarget = remoteTargets.includes(active);
       const clearKeys = ["Escape", "BrowserBack", "Back", "GoBack", "Home", "BrowserHome"];
       const remoteKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Enter", " ", ...clearKeys];
+
+      if (remoteBackdrop.classList.contains("open") && !remoteTestPanel.classList.contains("hidden") && !clearKeys.includes(event.key)) {
+        event.preventDefault();
+        updateRemoteTestKey(event);
+        return;
+      }
 
       if (!remoteKeys.includes(event.key)) {
         return;

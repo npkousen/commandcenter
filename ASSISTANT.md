@@ -25,7 +25,7 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - Preserve kiosk behavior: no document scrolling in fullscreen, card size capped to one-third of the shorter viewport side, arrow-key/remote navigation, and Enter-to-open app cards.
 - In settings mode, do not make app cards remote-focusable; expose add/edit/delete/reorder and layout controls instead.
 - Supported layout widths are 2, 3, and 4 columns. Rows are automatic.
-- The visible footer version is currently `0.2.1`. Increment by `0.0.1` for routine updates and by `0.1.0` for larger releases.
+- The visible footer version is currently `0.2.2`. Increment by `0.0.1` for routine updates and by `0.1.0` for larger releases.
 - Homepage name, accent color, background color, background image, app transparency level, and app logos are stored in the same shared/local state model as app cards. Uploaded images are stored as browser data URLs, so keep them small enough for localStorage.
 - `assets/bliss.png` is the default published background image and should stay referenced as an asset rather than embedded in `index.html`.
 - Raw source images such as `assets/bliss_raw.png` should not be shipped in published builds unless intentionally needed at runtime.
@@ -33,3 +33,4 @@ The user explicitly prefers a straightforward implementation concentrated in a s
 - The default background color is Blue (`#1e3a8a`), the default accent color is Green (`#5ba37d`), the default app transparency level is `0`, and the default layout is 3 columns.
 - Settings mode supports exporting/importing the current local setup as JSON; imported files must pass the same `validateState` path used for `apps.json`.
 - App records can be `link`, `weather`, or `clock`. Weather widgets use Open-Meteo geocoding/forecast APIs with no API key; clock widgets render locally with `Intl.DateTimeFormat`.
+- The Remote Settings modal is a CommandCenter UI shell for kousen-remote. Real pairing, forgetting, mapping persistence, battery, and signal status need a kiosk-local service/API; the static GitHub Pages app cannot write Linux input configuration by itself.
